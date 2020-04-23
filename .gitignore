@@ -1,0 +1,22 @@
+# Java
+
+# Build
+build
+out
+
+# Gradle
+.gradle
+
+# IntelliJ
+.idea
+
+# docs
+docs
+
+# MacOSX
+.DS_Store
+tko-libraries.iml
+cpp-util/cmake-build-debug/tko-libraries-cpp-util.pdb
+cpp-util/cmake-build-debug/tko-libraries-cpp-util.ilk
+cpp-util/cmake-build-debug/tko-libraries-cpp-util.ilk
+cpp-util/cmake-build-debug/tko-libraries-cpp-util.exp
