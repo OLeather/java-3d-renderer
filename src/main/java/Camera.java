@@ -49,14 +49,14 @@ public class Camera {
         //Calculate X and Y pixels. Because cameras reflect light opposite, the values are negative.
         double px = -focalLength*Math.tan(thetaX);
         double py = -focalLength*Math.tan(thetaY);
-        if(Double.isNaN(px) || Double.isInfinite(px)){
-            px = 0;
-        }
-        if(Double.isNaN(py) || Double.isInfinite(py)){
-            py = 0;
-        }
+        px = checkForIncorrectNumbers(px);
+        py = checkForIncorrectNumbers(py);
         System.out.println(focalLength + " " + thetaY);
         return new Point2D.Double(px, py);
+    }
+
+    private double checkForIncorrectNumbers(double x){
+        return Double.isNaN(x) || Double.isInfinite(x) ? 0 : x;
     }
 
     public Point3D getPosition(){
