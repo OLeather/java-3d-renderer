@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -25,6 +26,10 @@ public class Renderer extends JFrame {
 
     public void renderObjects() {
 
+    }
+
+    public Point2D cameraToScreenCoordinate(Point2D point){
+        return new Point2D.Double(point.getX() + getWidth()/2, point.getY() + getHeight()/2);
     }
 
     @Override

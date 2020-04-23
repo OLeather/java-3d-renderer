@@ -1,8 +1,8 @@
 import java.awt.geom.Point2D;
 
 public class Camera {
-    private Point3D position;
-    private Point3D rotation;
+    private Point3D position = new Point3D(0,0,0);
+    private Point3D rotation = new Point3D(0,0,0);
 
     private double pxWidth, pxHeight;
     private double hFov;
@@ -44,9 +44,19 @@ public class Camera {
 
     public Point2D project3dPointTo2dPlane(Point3D point3D){
         Point3D cameraRelativePoint = calculateCameraRelativePoint(point3D);
-        Point2D projectedPoint = new Point2D.Double();
-        //TODO: Calculate projection
-        return projectedPoint;
+        double thetaX = Math.atan2(point3D.getX(), point3D.getZ());
+        double thetaY = Math.atan2(point3D.getY(), point3D.getZ());
+        //Calculate X and Y pixels. Because cameras reflect light opposite, the values are negative.
+        double px = -focalLength*Math.tan(thetaX);
+        double py = -focalLength*Math.tan(thetaY);
+        if(Double.isNaN(px) || Double.isInfinite(px)){
+            px = 0;
+        }
+        if(Double.isNaN(py) || Double.isInfinite(py)){
+            py = 0;
+        }
+        System.out.println(focalLength + " " + thetaY);
+        return new Point2D.Double(px, py);
     }
 
     public Point3D getPosition(){
