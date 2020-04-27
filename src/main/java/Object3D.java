@@ -6,20 +6,29 @@ public class Object3D {
     private Point3D position;
     private Point3D rotation;
 
-    public static Object3D rectangle(double width, double height, double length, String name){
+    public static Object3D rectangle(double width, double height, double length, String name) {
         Tri[] tris = new Tri[]{};
         return new Object3D(tris, name);
     }
 
-    public Object3D(Tri[] tris, String name){
+    public Object3D(Tri[] tris, String name) {
         this.tris = tris;
         this.name = name;
     }
 
-    public Tri[] getPositionedTris(){
+    public Tri[] getPositionedTris() {
         Tri[] positionedTris = new Tri[tris.length];
-        //TODO: Compute positioned tris
-        //TODO: Compute rotated tris position
+        for (int i = 0; i < tris.length; i++) {
+            Point3D[] triPoints = new Point3D[3];
+            for (int j = 0; j < triPoints.length; j++) {
+                triPoints[i] = Renderer.getInstance().getPointRelativeToPosition(triPoints[i], rotation);
+                triPoints[i] = Renderer.getInstance().apply3DRotationMatrix(triPoints[i], rotation);
+            }
+            positionedTris[i].setV0(triPoints[0]);
+            positionedTris[i].setV1(triPoints[1]);
+            positionedTris[i].setV2(triPoints[2]);
+        }
+
         return positionedTris;
     }
 

@@ -1,3 +1,5 @@
+import org.ejml.simple.SimpleMatrix;
+
 public class Point3D {
     private double x;
     private double y;
@@ -7,6 +9,23 @@ public class Point3D {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    /**
+     * Returns a {@link Point3D} from the input <code>point</code> multiplied by the input <code>matrix</code>.
+     *
+     * @param point
+     * @param matrix
+     * @return
+     */
+    public static Point3D applyMatrix(Point3D point, SimpleMatrix matrix){
+        SimpleMatrix pointMatrix = new SimpleMatrix(new double[][]{
+                {point.getX()},
+                {point.getY()},
+                {point.getZ()}
+        });
+        SimpleMatrix appliedMatrix = pointMatrix.mult(matrix);
+        return new Point3D(appliedMatrix.get(0), appliedMatrix.get(1), appliedMatrix.get(2));
     }
 
     public double getX() {

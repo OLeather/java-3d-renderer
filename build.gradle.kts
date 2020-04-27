@@ -11,6 +11,7 @@ repositories {
 
 dependencies {
     testCompile("junit", "junit", "4.12")
+    compile(group = "org.ejml", name = "ejml-all", version = "0.38")
 }
 
 configure<JavaPluginConvention> {
