@@ -1,23 +1,21 @@
-import javax.swing.text.html.ObjectView;
-
 public class Object3D {
-    private Tri[] tris;
+    private Tri3D[] tris;
     private String name;
     private Point3D position;
     private Point3D rotation;
 
     public static Object3D rectangle(double width, double height, double length, String name) {
-        Tri[] tris = new Tri[]{};
+        Tri3D[] tris = new Tri3D[]{};
         return new Object3D(tris, name);
     }
 
-    public Object3D(Tri[] tris, String name) {
+    public Object3D(Tri3D[] tris, String name) {
         this.tris = tris;
         this.name = name;
     }
 
-    public Tri[] getPositionedTris() {
-        Tri[] positionedTris = new Tri[tris.length];
+    public Tri3D[] getPositionedTris() {
+        Tri3D[] positionedTris = new Tri3D[tris.length];
         for (int i = 0; i < tris.length; i++) {
             Point3D[] triPoints = new Point3D[3];
             for (int j = 0; j < triPoints.length; j++) {
@@ -32,11 +30,11 @@ public class Object3D {
         return positionedTris;
     }
 
-    public Tri[] getTris() {
+    public Tri3D[] getTris() {
         return tris;
     }
 
-    public void setTris(Tri[] tris) {
+    public void setTris(Tri3D[] tris) {
         this.tris = tris;
     }
 

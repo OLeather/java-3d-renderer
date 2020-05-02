@@ -1,9 +1,9 @@
-public class Tri {
+public class Tri3D {
     private Point3D v0;
     private Point3D v1;
     private Point3D v2;
 
-    public Tri(Point3D v0, Point3D v1, Point3D v2){
+    public Tri3D(Point3D v0, Point3D v1, Point3D v2){
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;
@@ -31,5 +31,14 @@ public class Tri {
 
     public void setV2(Point3D v2) {
         this.v2 = v2;
+    }
+
+    @Override
+    public String toString() {
+        return "Tri3D{" +
+                "v0=" + v0 +
+                ", v1=" + v1 +
+                ", v2=" + v2 +
+                '}';
     }
 }

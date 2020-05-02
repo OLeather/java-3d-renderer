@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class Renderer extends JFrame {
@@ -15,10 +16,12 @@ public class Renderer extends JFrame {
 
     private ArrayList<Object3D> objects = new ArrayList<>();
 
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 500;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 800;
 
-    private Color[][] pixelColors;
+    private Color[][] pixelColors = new Color[WIDTH][HEIGHT];
+
+    private Camera camera;
 
     private Renderer() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -26,15 +29,98 @@ public class Renderer extends JFrame {
         setVisible(true);
     }
 
+    public void setCamera(Camera camera) {
+        this.camera = camera;
+    }
+
     public void renderObjects() {
-        for(Object o : objects){
+        for (Object o : objects) {
 
         }
     }
 
-    public Point2D cameraToScreenCoordinate(Point2D point) {
-        return new Point2D.Double(point.getX() + getWidth() / 2, point.getY() + getHeight() / 2);
+    public Color[][] calculateZBuffer(TriBoundBox[] tris){
+        
+        return new Color[][]{};
     }
+
+    public Tri2D projectTri3DTo2D(Tri3D tri3D) {
+        return new Tri2D(camera.project3dPointTo2dPlane(tri3D.getV0()), camera.project3dPointTo2dPlane(tri3D.getV1()),
+                camera.project3dPointTo2dPlane(tri3D.getV2()));
+    }
+
+    public void testRenderTri(Tri2D tri) {
+        TriBoundBox box = calculateTriBoundBox(tri);
+        Color[][] pixels = new Color[getWidth()][getHeight()];
+        for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
+            for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
+                if (box.getPixels()[x - box.getX()][y - box.getY()]) {
+                    pixels[x][y] = Color.RED;
+                }
+            }
+        }
+        setPixelColors(pixels);
+    }
+
+    public TriBoundBox calculateTriBoundBox(Tri2D tri) {
+        //Here we are trying to find the bounding box of the tri. The bounding box consists of an X, Y, width, and
+        //height value. The x and y values are the top left corner point of the tri bounding box, and the width and
+        //height are the width and height of the tri bounding box on the screen.
+        int boundX = 999999;
+        int boundY = 999999;
+        int boundXBottom = 0;
+        int boundYBottom = 0;
+
+        Point2D[] points = new Point2D[]{cameraToScreenCoordinate(tri.getV0()), cameraToScreenCoordinate(tri.getV1()),
+                cameraToScreenCoordinate(tri.getV2())};
+        //Loop through all points once to get the bound X
+        for (Point2D p : points) {
+            if (p.getX() < boundX) {
+                boundX = (int) p.getX();
+            }
+            if (p.getY() < boundY) {
+                boundY = (int) p.getY();
+            }
+            if (p.getX() > boundXBottom) {
+                boundXBottom = (int) p.getX();
+            }
+            if (p.getY() > boundYBottom) {
+                boundYBottom = (int) p.getY();
+            }
+        }
+
+        //Calculate width and height for bound box given bound coordinates and bound bottom coordinates
+        int boundWidth = Math.abs(boundXBottom - boundX);
+        int boundHeight = Math.abs(boundYBottom - boundY);
+
+        boolean[][] triPixels = new boolean[boundWidth][boundHeight];
+        for (int x = 0; x < triPixels.length; x++) {
+            for (int y = 0; y < triPixels[0].length; y++) {
+                triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY), new Tri2D(points[0], points[1], points[2]));
+            }
+        }
+
+        return new TriBoundBox(triPixels, boundX, boundY);
+    }
+
+    double triangleArea(Tri2D triangle) {
+        return Math.abs((triangle.getV0().getX() * (triangle.getV1().getY() - triangle.getV2().getY()) +
+                triangle.getV1().getX() * (triangle.getV2().getY() - triangle.getV0().getY()) +
+                triangle.getV2().getX() * (triangle.getV0().getY() - triangle.getV1().getY())) / 2.0);
+    }
+
+    public boolean pointInTriangle(Point2D pt, Tri2D triangle) {
+        double area = triangleArea(triangle);
+        double area1 = triangleArea(new Tri2D(pt, triangle.getV1(), triangle.getV2()));
+        double area2 = triangleArea(new Tri2D(triangle.getV0(), pt, triangle.getV2()));
+        double area3 = triangleArea(new Tri2D(triangle.getV0(), triangle.getV1(), pt));
+        return Math.abs(area - (area1 + area2 + area3)) < 1;
+    }
+
+    public Point2D cameraToScreenCoordinate(Point2D point) {
+        return new Point2D.Double(point.getX() + getWidth() / 2, -point.getY() + getHeight() / 2);
+    }
+
 
     public Point3D getPointRelativeToPosition(Point3D point, Point3D position) {
         return new Point3D(
@@ -136,5 +222,49 @@ public class Renderer extends JFrame {
     public void setPixelColors(Color[][] pixelColors) {
         this.pixelColors = pixelColors;
         repaint();
+    }
+
+    class TriBoundBox {
+        private boolean[][] pixels;
+        private int x;
+        private int y;
+
+        public TriBoundBox(boolean[][] pixels, int x, int y) {
+            this.pixels = pixels;
+            this.x = x;
+            this.y = y;
+        }
+
+        public boolean[][] getPixels() {
+            return pixels;
+        }
+
+        public void setPixels(boolean[][] pixels) {
+            this.pixels = pixels;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public void setX(int x) {
+            this.x = x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        public void setY(int y) {
+            this.y = y;
+        }
+
+        public int getWidth() {
+            return this.getPixels().length;
+        }
+
+        public int getHeight() {
+            return this.getPixels()[0].length;
+        }
     }
 }

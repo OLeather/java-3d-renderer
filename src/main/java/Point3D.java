@@ -24,7 +24,7 @@ public class Point3D {
                 {point.getY()},
                 {point.getZ()}
         });
-        SimpleMatrix appliedMatrix = pointMatrix.mult(matrix);
+        SimpleMatrix appliedMatrix = matrix.mult(pointMatrix);
         return new Point3D(appliedMatrix.get(0), appliedMatrix.get(1), appliedMatrix.get(2));
     }
 
