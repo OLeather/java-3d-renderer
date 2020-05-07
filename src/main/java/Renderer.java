@@ -34,8 +34,11 @@ public class Renderer extends JFrame {
     }
 
     public void renderObjects() {
-        for (Object o : objects) {
-
+        for (Object3D o : objects) {
+            for(Tri3D tri : o.getPositionedTris()){
+                Tri2D projectedTri = projectTri3DTo2D(tri);
+                testRenderTri(projectedTri);
+            }
         }
     }
 
@@ -94,6 +97,7 @@ public class Renderer extends JFrame {
         int boundHeight = Math.abs(boundYBottom - boundY);
 
         boolean[][] triPixels = new boolean[boundWidth][boundHeight];
+
         for (int x = 0; x < triPixels.length; x++) {
             for (int y = 0; y < triPixels[0].length; y++) {
                 triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY), new Tri2D(points[0], points[1], points[2]));

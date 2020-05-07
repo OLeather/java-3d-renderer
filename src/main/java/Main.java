@@ -4,8 +4,14 @@ public class Main {
         Renderer.getInstance().setCamera(camera);
         camera.setCamPosition(0, 0, 0);
         camera.setCamRotationDegrees(0, 0, 0);
-        Tri3D tri3D = new Tri3D(new Point3D(0, 0, 50),new Point3D(5, 5, 50),new Point3D(0, 5, 50));
-        Tri2D tri2D = Renderer.getInstance().projectTri3DTo2D(tri3D);
-        Renderer.getInstance().testRenderTri(tri2D);
+
+        Object3D object3D = new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0),new Point3D(5, 5, 0),new Point3D(0, 5, 0))}, "Test OBJ");
+
+        object3D.setPosition(new Point3D(0, 0, 50));
+        object3D.setRotationDegrees(new Point3D(45, 45, 0));
+
+        Renderer.getInstance().addObject(object3D);
+
+        Renderer.getInstance().renderObjects();
     }
 }

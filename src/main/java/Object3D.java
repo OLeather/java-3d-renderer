@@ -1,8 +1,8 @@
 public class Object3D {
     private Tri3D[] tris;
     private String name;
-    private Point3D position;
-    private Point3D rotation;
+    private Point3D position = new Point3D(0, 0, 0);
+    private Point3D rotation = new Point3D(0, 0, 0);
 
     public static Object3D rectangle(double width, double height, double length, String name) {
         Tri3D[] tris = new Tri3D[]{};
@@ -16,17 +16,14 @@ public class Object3D {
 
     public Tri3D[] getPositionedTris() {
         Tri3D[] positionedTris = new Tri3D[tris.length];
-        for (int i = 0; i < tris.length; i++) {
-            Point3D[] triPoints = new Point3D[3];
+        for (int i = 0; i < positionedTris.length; i++) {
+            Point3D[] triPoints = new Point3D[]{tris[i].getV0(),tris[i].getV1(),tris[i].getV2()};
             for (int j = 0; j < triPoints.length; j++) {
-                triPoints[i] = Renderer.getInstance().getPointRelativeToPosition(triPoints[i], rotation);
-                triPoints[i] = Renderer.getInstance().apply3DRotationMatrix(triPoints[i], rotation);
+                triPoints[j] = Renderer.getInstance().apply3DRotationMatrix(triPoints[j], rotation);
+                triPoints[j] = Renderer.getInstance().getPointRelativeToPosition(triPoints[j], position);
             }
-            positionedTris[i].setV0(triPoints[0]);
-            positionedTris[i].setV1(triPoints[1]);
-            positionedTris[i].setV2(triPoints[2]);
+            positionedTris[i] = new Tri3D(triPoints[0],triPoints[1],triPoints[2]);
         }
-
         return positionedTris;
     }
 
@@ -54,11 +51,15 @@ public class Object3D {
         this.position = position;
     }
 
-    public Point3D getRotation() {
+    public Point3D getRotationRads() {
         return rotation;
     }
 
-    public void setRotation(Point3D rotation) {
+    public void setRotationRads(Point3D rotation) {
         this.rotation = rotation;
+    }
+
+    public void setRotationDegrees(Point3D rotation) {
+        this.rotation = new Point3D(Math.toRadians(rotation.getX()),Math.toRadians(rotation.getY()),Math.toRadians(rotation.getZ()));
     }
 }

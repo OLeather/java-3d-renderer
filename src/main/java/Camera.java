@@ -42,9 +42,7 @@ public class Camera {
     public Point3D calculateCameraRelativePoint(Point3D point){
         Point3D output;
         output = new Point3D(point.getX()-position.getX(), point.getY()-position.getY(), point.getZ()-position.getZ());
-        System.out.println(rotation);
         output = Renderer.getInstance().apply3DRotationMatrix(output, rotation);
-        System.out.println(output);
         return output;
     }
 
