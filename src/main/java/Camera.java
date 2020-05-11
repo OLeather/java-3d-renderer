@@ -46,7 +46,7 @@ public class Camera {
         return output;
     }
 
-    public Point2D project3dPointTo2dPlane(Point3D point3D){
+    public Point2D project3dPointToCameraPlane(Point3D point3D){
         Point3D cameraRelativePoint = calculateCameraRelativePoint(point3D);
         double thetaX = Math.atan2(cameraRelativePoint.getX(), cameraRelativePoint.getZ());
         double thetaY = Math.atan2(cameraRelativePoint.getY(), cameraRelativePoint.getZ());
@@ -57,6 +57,41 @@ public class Camera {
         py = checkForIncorrectNumbers(py);
 
         return new Point2D.Double(px, py);
+    }
+
+    public Point3D getRayVectorFromScreenPoint(Point2D screenPoint){
+        double px = screenPoint.getX();
+        double py = screenPoint.getY();
+
+        double thetaX = Math.atan2(px, focalLength);
+        double thetaY = Math.atan2(py, focalLength);
+
+        return new Point3D(Math.tan(thetaX), Math.tan(thetaY), -1);
+    }
+
+    public double getScreenDistanceToPlane(Point2D screenPoint, Tri3D tri){
+        Point3D rayVector = getRayVectorFromScreenPoint(screenPoint);
+        Point3D planeNormal = tri.getPlaneNormalVector();
+
+        Point3D planePoint = getPlaneRayIntersection(rayVector, planeNormal, tri.getV0());
+
+        return planePoint.distance(new Point3D());
+    }
+
+    /**
+     * https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane
+     *
+     * @param rayVector
+     * @param planeNormal
+     * @param planePoint
+     * @return
+     */
+    public Point3D getPlaneRayIntersection(Point3D rayVector, Point3D planeNormal, Point3D planePoint){
+        Point3D diff = new Point3D().minus(planePoint);
+        double prod1 = diff.dot(planeNormal);
+        double prod2 = rayVector.dot(planeNormal);
+        double prod3 = prod1/prod2;
+        return new Point3D().minus(rayVector.times(prod3));
     }
 
     private double checkForIncorrectNumbers(double x){

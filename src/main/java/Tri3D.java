@@ -1,3 +1,5 @@
+import org.ejml.simple.SimpleMatrix;
+
 public class Tri3D {
     private Point3D v0;
     private Point3D v1;
@@ -7,6 +9,19 @@ public class Tri3D {
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Point3D getPlaneNormalVector(){
+        Point3D a = v0;
+        Point3D b = v1;
+        Point3D c = v2;
+        Point3D dir = b.minus(a).cross(c.minus(a));
+
+        return dir;
     }
 
     public Point3D getV0() {

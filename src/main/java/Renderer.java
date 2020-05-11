@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class Renderer extends JFrame {
@@ -34,26 +34,71 @@ public class Renderer extends JFrame {
     }
 
     public void renderObjects() {
-        for (Object3D o : objects) {
-            for(Tri3D tri : o.getPositionedTris()){
-                Tri2D projectedTri = projectTri3DTo2D(tri);
-                testRenderTri(projectedTri);
+        ArrayList<Tri3D> tris = new ArrayList();
+        ArrayList<Color> triColors = new ArrayList();
+        for(Object3D obj : objects){
+            for(Tri3D tri : obj.getPositionedTris()){
+                tris.add(tri);
+                triColors.add(obj.getColor());
             }
         }
+
+        TriBoundBox[] triBoundBoxes = getTriBoundBoxes(tris.toArray(new Tri3D[]{}));
+        setPixelColors(calculateZBuffer(triBoundBoxes, triColors.toArray(new Color[]{})));
     }
 
-    public Color[][] calculateZBuffer(TriBoundBox[] tris){
-        
-        return new Color[][]{};
+    public TriBoundBox[] getTriBoundBoxes(Tri3D[] tris){
+        TriBoundBox[] boxes = new TriBoundBox[tris.length];
+        int i = 0;
+        for(Tri3D tri3D : tris){
+            Tri2D tri2D = projectTri3DTo2D(tri3D);
+            boxes[i] = calculateTriBoundBox(tri2D, tri3D);
+            i++;
+        }
+        return boxes;
+    }
+
+    public Color[][] calculateZBuffer(TriBoundBox[] tris, Color[] triColors){
+        Color[][] pixels = new Color[getWidth()][getHeight()];
+        for(int x = 0; x < pixels.length; x++){
+            for(int y = 0; y < pixels[0].length; y++){
+                pixels[x][y] = new Color(0, 0, 0);
+            }
+        }
+        double[][] distances = new double[getWidth()][getHeight()];
+        int i = 0;
+        for(TriBoundBox box : tris){
+            for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
+                for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
+                    if (box.getPixels()[x - box.getX()][y - box.getY()]) {
+                        double distance = camera.getScreenDistanceToPlane(new Point2D.Double(x, y), box.getTri3D());
+//                        double debugMaxDistance = 50;
+//                        Color debugColor = new Color(255, 255, 255, Math.min(Math.max(255-(int)(distance/debugMaxDistance*255),0),255));
+                        if(pixels[x][y].equals(new Color(0, 0, 0))){
+                            pixels[x][y] = triColors[i];
+                            distances[x][y] = distance;
+                        }
+                        else{
+                            if(distance < distances[x][y]){
+                                pixels[x][y] =  triColors[i];
+                                distances[x][y] = distance;
+                            }
+                        }
+                    }
+                }
+            }
+            i++;
+        }
+        return pixels;
     }
 
     public Tri2D projectTri3DTo2D(Tri3D tri3D) {
-        return new Tri2D(camera.project3dPointTo2dPlane(tri3D.getV0()), camera.project3dPointTo2dPlane(tri3D.getV1()),
-                camera.project3dPointTo2dPlane(tri3D.getV2()));
+        return new Tri2D(camera.project3dPointToCameraPlane(tri3D.getV0()), camera.project3dPointToCameraPlane(tri3D.getV1()),
+                camera.project3dPointToCameraPlane(tri3D.getV2()));
     }
 
-    public void testRenderTri(Tri2D tri) {
-        TriBoundBox box = calculateTriBoundBox(tri);
+    public void testRenderTri(Tri2D tri, Tri3D tri3D) {
+        TriBoundBox box = calculateTriBoundBox(tri, tri3D);
         Color[][] pixels = new Color[getWidth()][getHeight()];
         for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
             for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
@@ -65,7 +110,7 @@ public class Renderer extends JFrame {
         setPixelColors(pixels);
     }
 
-    public TriBoundBox calculateTriBoundBox(Tri2D tri) {
+    public TriBoundBox calculateTriBoundBox(Tri2D tri, Tri3D tri3D) {
         //Here we are trying to find the bounding box of the tri. The bounding box consists of an X, Y, width, and
         //height value. The x and y values are the top left corner point of the tri bounding box, and the width and
         //height are the width and height of the tri bounding box on the screen.
@@ -104,7 +149,7 @@ public class Renderer extends JFrame {
             }
         }
 
-        return new TriBoundBox(triPixels, boundX, boundY);
+        return new TriBoundBox(triPixels, boundX, boundY, tri3D);
     }
 
     double triangleArea(Tri2D triangle) {
@@ -232,11 +277,13 @@ public class Renderer extends JFrame {
         private boolean[][] pixels;
         private int x;
         private int y;
+        private Tri3D tri3D;
 
-        public TriBoundBox(boolean[][] pixels, int x, int y) {
+        public TriBoundBox(boolean[][] pixels, int x, int y, Tri3D tri3D) {
             this.pixels = pixels;
             this.x = x;
             this.y = y;
+            this.tri3D = tri3D;
         }
 
         public boolean[][] getPixels() {
@@ -269,6 +316,14 @@ public class Renderer extends JFrame {
 
         public int getHeight() {
             return this.getPixels()[0].length;
+        }
+
+        public Tri3D getTri3D() {
+            return tri3D;
+        }
+
+        public void setTri3D(Tri3D tri3D) {
+            this.tri3D = tri3D;
         }
     }
 }

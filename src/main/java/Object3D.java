@@ -1,17 +1,21 @@
+import java.awt.*;
+
 public class Object3D {
     private Tri3D[] tris;
     private String name;
+    private Color color;
     private Point3D position = new Point3D(0, 0, 0);
     private Point3D rotation = new Point3D(0, 0, 0);
 
-    public static Object3D rectangle(double width, double height, double length, String name) {
+    public static Object3D rectangle(double width, double height, double length, String name, Color color) {
         Tri3D[] tris = new Tri3D[]{};
-        return new Object3D(tris, name);
+        return new Object3D(tris, name, color);
     }
 
-    public Object3D(Tri3D[] tris, String name) {
+    public Object3D(Tri3D[] tris, String name, Color color) {
         this.tris = tris;
         this.name = name;
+        this.color = color;
     }
 
     public Tri3D[] getPositionedTris() {
@@ -61,5 +65,13 @@ public class Object3D {
 
     public void setRotationDegrees(Point3D rotation) {
         this.rotation = new Point3D(Math.toRadians(rotation.getX()),Math.toRadians(rotation.getY()),Math.toRadians(rotation.getZ()));
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }
