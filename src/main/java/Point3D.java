@@ -6,7 +6,7 @@ public class Point3D {
     private double z;
 
     public Point3D() {
-        this(0,0,0);
+        this(0, 0, 0);
     }
 
     public Point3D(double x, double y, double z) {
@@ -57,10 +57,10 @@ public class Point3D {
         return other.getX() * getX() + other.getY() * getY() + other.getZ() * getZ();
     }
 
-    public Point3D cross(Point3D other){
-        double newX = y*other.getZ()-z*other.getY();
-        double newY = z*other.getX()-x*other.getZ();
-        double newZ = x*other.getY()-y*other.getX();
+    public Point3D cross(Point3D other) {
+        double newX = y * other.getZ() - z * other.getY();
+        double newY = z * other.getX() - x * other.getZ();
+        double newZ = x * other.getY() - y * other.getX();
         return new Point3D(newX, newY, newZ);
     }
 

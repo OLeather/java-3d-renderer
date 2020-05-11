@@ -4,23 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class Renderer extends JFrame {
-    private static Renderer instance = new Renderer();
-
-    public static Renderer getInstance() {
-        return instance;
-    }
-
-    private ArrayList<Object3D> objects = new ArrayList<>();
-
     private static final int WIDTH = 800;
     private static final int HEIGHT = 800;
-
+    private static Renderer instance = new Renderer();
+    private ArrayList<Object3D> objects = new ArrayList<>();
     private Color[][] pixelColors = new Color[WIDTH][HEIGHT];
-
     private Camera camera;
 
     private Renderer() {
@@ -29,58 +20,79 @@ public class Renderer extends JFrame {
         setVisible(true);
     }
 
+    public static Renderer getInstance() {
+        return instance;
+    }
+
     public void setCamera(Camera camera) {
         this.camera = camera;
     }
 
+    /**
+     * Renders all the objects added to the {@link Renderer}.
+     */
     public void renderObjects() {
+        //Keep track of a list of all tris and their colors.
         ArrayList<Tri3D> tris = new ArrayList();
         ArrayList<Color> triColors = new ArrayList();
-        for(Object3D obj : objects){
-            for(Tri3D tri : obj.getPositionedTris()){
+        //Loop through all tris in all objects
+        for (Object3D obj : objects) {
+            for (Tri3D tri : obj.getPositionedTris()) {
                 tris.add(tri);
                 triColors.add(obj.getColor());
             }
         }
 
-        TriBoundBox[] triBoundBoxes = getTriBoundBoxes(tris.toArray(new Tri3D[]{}));
-        setPixelColors(calculateZBuffer(triBoundBoxes, triColors.toArray(new Color[]{})));
+        //Calculate all render tris
+        RenderTri[] renderTris = getRenderTris(tris.toArray(new Tri3D[]{}));
+
+        //Calculate the zbuffer and render the tris to pixels
+        Color[][] renderedPixels = calculateZBuffer(renderTris, triColors.toArray(new Color[]{}));
+
+        //Draw pixels on the screen
+        setPixelColors(renderedPixels);
     }
 
-    public TriBoundBox[] getTriBoundBoxes(Tri3D[] tris){
-        TriBoundBox[] boxes = new TriBoundBox[tris.length];
+    /**
+     * Calculates all of the render tris given an array of {@link Tri3D}'s and returns it in the form of an array.
+     *
+     * @param tris
+     * @return
+     */
+    public RenderTri[] getRenderTris(Tri3D[] tris) {
+        RenderTri[] renderTris = new RenderTri[tris.length];
         int i = 0;
-        for(Tri3D tri3D : tris){
-            Tri2D tri2D = projectTri3DTo2D(tri3D);
-            boxes[i] = calculateTriBoundBox(tri2D, tri3D);
+        for (Tri3D tri3D : tris) {
+            renderTris[i] = calculateRenderTri(tri3D);
             i++;
         }
-        return boxes;
+        return renderTris;
     }
 
-    public Color[][] calculateZBuffer(TriBoundBox[] tris, Color[] triColors){
+    public Color[][] calculateZBuffer(RenderTri[] tris, Color[] triColors) {
         Color[][] pixels = new Color[getWidth()][getHeight()];
-        for(int x = 0; x < pixels.length; x++){
-            for(int y = 0; y < pixels[0].length; y++){
+        for (int x = 0; x < pixels.length; x++) {
+            for (int y = 0; y < pixels[0].length; y++) {
                 pixels[x][y] = new Color(0, 0, 0);
             }
         }
         double[][] distances = new double[getWidth()][getHeight()];
         int i = 0;
-        for(TriBoundBox box : tris){
+        for (RenderTri renderTri : tris) {
+            TriBoundBox box = renderTri.getBoundBox();
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
                 for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
                     if (box.getPixels()[x - box.getX()][y - box.getY()]) {
-                        double distance = camera.getScreenDistanceToPlane(new Point2D.Double(x, y), box.getTri3D());
+                        double distance =
+                                camera.getScreenDistanceToPlane(new Point2D.Double(x, y), renderTri.getTri3D());
 //                        double debugMaxDistance = 50;
 //                        Color debugColor = new Color(255, 255, 255, Math.min(Math.max(255-(int)(distance/debugMaxDistance*255),0),255));
-                        if(pixels[x][y].equals(new Color(0, 0, 0))){
+                        if (pixels[x][y].equals(new Color(0, 0, 0))) {
                             pixels[x][y] = triColors[i];
                             distances[x][y] = distance;
-                        }
-                        else{
-                            if(distance < distances[x][y]){
-                                pixels[x][y] =  triColors[i];
+                        } else {
+                            if (distance < distances[x][y]) {
+                                pixels[x][y] = triColors[i];
                                 distances[x][y] = distance;
                             }
                         }
@@ -93,12 +105,18 @@ public class Renderer extends JFrame {
     }
 
     public Tri2D projectTri3DTo2D(Tri3D tri3D) {
-        return new Tri2D(camera.project3dPointToCameraPlane(tri3D.getV0()), camera.project3dPointToCameraPlane(tri3D.getV1()),
+        return new Tri2D(camera.project3dPointToCameraPlane(tri3D.getV0()),
+                camera.project3dPointToCameraPlane(tri3D.getV1()),
                 camera.project3dPointToCameraPlane(tri3D.getV2()));
     }
 
-    public void testRenderTri(Tri2D tri, Tri3D tri3D) {
-        TriBoundBox box = calculateTriBoundBox(tri, tri3D);
+    /**
+     * Test function used to render a single Tri3D without zbuffer calculation.
+     *
+     * @param tri3D
+     */
+    public void testRenderTri(Tri3D tri3D) {
+        TriBoundBox box = calculateRenderTri(tri3D).getBoundBox();
         Color[][] pixels = new Color[getWidth()][getHeight()];
         for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
             for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
@@ -110,17 +128,36 @@ public class Renderer extends JFrame {
         setPixelColors(pixels);
     }
 
-    public TriBoundBox calculateTriBoundBox(Tri2D tri, Tri3D tri3D) {
-        //Here we are trying to find the bounding box of the tri. The bounding box consists of an X, Y, width, and
-        //height value. The x and y values are the top left corner point of the tri bounding box, and the width and
-        //height are the width and height of the tri bounding box on the screen.
+    /**
+     * Creates the render tri given a {@link Tri3D}.
+     *
+     * @param tri3D
+     * @return
+     */
+    public RenderTri calculateRenderTri(Tri3D tri3D) {
+        Tri2D tri2D = projectTri3DTo2D(tri3D);
+        TriBoundBox boundBox = calculateTriBoundBox(tri2D);
+        return new RenderTri(boundBox, tri3D);
+    }
+
+    /**
+     * Calculates the {@link TriBoundBox} given A {@link Tri2D}.
+     *
+     * @param tri2D
+     * @return
+     */
+    public TriBoundBox calculateTriBoundBox(Tri2D tri2D) {
+        //Here we are trying to find the bounding box of the tri2D. The bounding box consists of an X, Y, width, and
+        //height value. The x and y values are the top left corner point of the tri2D bounding box, and the width and
+        //height are the width and height of the tri2D bounding box on the screen.
         int boundX = 999999;
         int boundY = 999999;
         int boundXBottom = 0;
         int boundYBottom = 0;
 
-        Point2D[] points = new Point2D[]{cameraToScreenCoordinate(tri.getV0()), cameraToScreenCoordinate(tri.getV1()),
-                cameraToScreenCoordinate(tri.getV2())};
+        Point2D[] points =
+                new Point2D[]{cameraToScreenCoordinate(tri2D.getV0()), cameraToScreenCoordinate(tri2D.getV1()),
+                        cameraToScreenCoordinate(tri2D.getV2())};
         //Loop through all points once to get the bound X
         for (Point2D p : points) {
             if (p.getX() < boundX) {
@@ -145,31 +182,41 @@ public class Renderer extends JFrame {
 
         for (int x = 0; x < triPixels.length; x++) {
             for (int y = 0; y < triPixels[0].length; y++) {
-                triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY), new Tri2D(points[0], points[1], points[2]));
+                triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY),
+                        new Tri2D(points[0], points[1], points[2]));
             }
         }
 
-        return new TriBoundBox(triPixels, boundX, boundY, tri3D);
+        return new TriBoundBox(triPixels, boundX, boundY);
     }
 
-    double triangleArea(Tri2D triangle) {
-        return Math.abs((triangle.getV0().getX() * (triangle.getV1().getY() - triangle.getV2().getY()) +
-                triangle.getV1().getX() * (triangle.getV2().getY() - triangle.getV0().getY()) +
-                triangle.getV2().getX() * (triangle.getV0().getY() - triangle.getV1().getY())) / 2.0);
-    }
-
+    /**
+     * Returns whether or not a point is within a triangle.
+     * <p>
+     * https://www.geeksforgeeks.org/check-whether-a-given-point-lies-inside-a-triangle-or-not/
+     *
+     * @param pt
+     * @param triangle
+     * @return
+     */
     public boolean pointInTriangle(Point2D pt, Tri2D triangle) {
-        double area = triangleArea(triangle);
-        double area1 = triangleArea(new Tri2D(pt, triangle.getV1(), triangle.getV2()));
-        double area2 = triangleArea(new Tri2D(triangle.getV0(), pt, triangle.getV2()));
-        double area3 = triangleArea(new Tri2D(triangle.getV0(), triangle.getV1(), pt));
+        double area = triangle.area();
+        double area1 = new Tri2D(pt, triangle.getV1(), triangle.getV2()).area();
+        double area2 = new Tri2D(triangle.getV0(), pt, triangle.getV2()).area();
+        double area3 = new Tri2D(triangle.getV0(), triangle.getV1(), pt).area();
         return Math.abs(area - (area1 + area2 + area3)) < 1;
     }
 
+    /**
+     * Gets the screen coordinates with (0,0) at the top left corner from a camera coordinate with (0,0) in the middle
+     * of the screen.
+     *
+     * @param point
+     * @return
+     */
     public Point2D cameraToScreenCoordinate(Point2D point) {
         return new Point2D.Double(point.getX() + getWidth() / 2, -point.getY() + getHeight() / 2);
     }
-
 
     public Point3D getPointRelativeToPosition(Point3D point, Point3D position) {
         return new Point3D(
@@ -236,6 +283,11 @@ public class Renderer extends JFrame {
         }
     }
 
+    /**
+     * Adds an {@link Object3D} to the renderer.
+     *
+     * @param object
+     */
     public void addObject(Object3D object) {
         boolean alreadyExists = false;
         for (Object3D o : objects) {
@@ -250,6 +302,12 @@ public class Renderer extends JFrame {
         }
     }
 
+    /**
+     * Returns an object from it's name
+     *
+     * @param name
+     * @return
+     */
     public Optional<Object3D> getObjectFromName(String name) {
         for (Object3D o : objects) {
             if (o.getName() == name) {
@@ -260,30 +318,83 @@ public class Renderer extends JFrame {
         return Optional.empty();
     }
 
+    /**
+     * Returns all objects rendered
+     *
+     * @return
+     */
     public ArrayList<Object3D> getObjects() {
         return objects;
     }
 
+    /**
+     * Sets all objects rendered
+     *
+     * @param objects
+     */
     public void setObjects(ArrayList<Object3D> objects) {
         this.objects = objects;
     }
 
+    /**
+     * Sets the 2d array of colors rendered onto the screen.
+     *
+     * @param pixelColors
+     */
     public void setPixelColors(Color[][] pixelColors) {
         this.pixelColors = pixelColors;
         repaint();
+    }
+
+    class RenderTri {
+        TriBoundBox boundBox;
+        private Tri3D tri3D;
+
+        /**
+         * Constructs a {@link RenderTri}, containing information about how to render the tri including its 2D bound
+         * box and its 3D tri used for zbuffer calculation.
+         *
+         * @param boundBox
+         * @param tri3D
+         */
+        public RenderTri(TriBoundBox boundBox, Tri3D tri3D) {
+            this.boundBox = boundBox;
+            this.tri3D = tri3D;
+        }
+
+        public TriBoundBox getBoundBox() {
+            return boundBox;
+        }
+
+        public void setBoundBox(TriBoundBox boundBox) {
+            this.boundBox = boundBox;
+        }
+
+        public Tri3D getTri3D() {
+            return tri3D;
+        }
+
+        public void setTri3D(Tri3D tri3D) {
+            this.tri3D = tri3D;
+        }
     }
 
     class TriBoundBox {
         private boolean[][] pixels;
         private int x;
         private int y;
-        private Tri3D tri3D;
 
-        public TriBoundBox(boolean[][] pixels, int x, int y, Tri3D tri3D) {
+        /**
+         * Constructs a {@link TriBoundBox}, which contains the bound box and pixel coordinates to render a {@link Tri2D}.
+         *
+         * @param pixels
+         * @param x
+         * @param y
+         */
+        public TriBoundBox(boolean[][] pixels, int x, int y) {
             this.pixels = pixels;
             this.x = x;
             this.y = y;
-            this.tri3D = tri3D;
         }
 
         public boolean[][] getPixels() {
@@ -316,14 +427,6 @@ public class Renderer extends JFrame {
 
         public int getHeight() {
             return this.getPixels()[0].length;
-        }
-
-        public Tri3D getTri3D() {
-            return tri3D;
-        }
-
-        public void setTri3D(Tri3D tri3D) {
-            this.tri3D = tri3D;
         }
     }
 }

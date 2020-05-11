@@ -5,10 +5,15 @@ public class Tri2D {
     private Point2D v1;
     private Point2D v2;
 
-    public Tri2D(Point2D v0, Point2D v1, Point2D v2){
+    public Tri2D(Point2D v0, Point2D v1, Point2D v2) {
         this.v0 = v0;
         this.v1 = v1;
         this.v2 = v2;
+    }
+
+    public double area() {
+        return Math.abs((v0.getX() * (v1.getY() - v2.getY()) + v1.getX() * (v2.getY() - v0.getY()) +
+                v2.getX() * (v0.getY() - v1.getY())) / 2.0);
     }
 
     public Point2D getV0() {
