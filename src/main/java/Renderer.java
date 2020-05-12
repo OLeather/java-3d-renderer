@@ -14,9 +14,13 @@ public class Renderer extends JFrame {
     private Color[][] pixelColors = new Color[WIDTH][HEIGHT];
     private Camera camera;
 
+    private RenderPanel renderPanel;
+
     private Renderer() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         pack();
+        this.renderPanel = new RenderPanel();
+        add(renderPanel);
         setVisible(true);
     }
 
@@ -266,23 +270,6 @@ public class Renderer extends JFrame {
         return outputPoint;
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        g.setColor(new Color(0, 0, 0));
-        g.fillRect(0, 0, WIDTH, HEIGHT);
-        for (int c = 0; c < pixelColors.length; c++) {
-            for (int r = 0; r < pixelColors[0].length; r++) {
-                if (pixelColors[r][c] == null) {
-                    g.setColor(new Color(0, 0, 0));
-                } else {
-                    g.setColor(pixelColors[r][c]);
-                }
-                g.drawLine(r, c, r, c);
-            }
-        }
-    }
-
     /**
      * Adds an {@link Object3D} to the renderer.
      *
@@ -343,7 +330,8 @@ public class Renderer extends JFrame {
      */
     public void setPixelColors(Color[][] pixelColors) {
         this.pixelColors = pixelColors;
-        repaint();
+        renderPanel.setPixels(pixelColors);
+        SwingUtilities.invokeLater(() -> renderPanel.repaint());
     }
 
     class RenderTri {
@@ -427,6 +415,32 @@ public class Renderer extends JFrame {
 
         public int getHeight() {
             return this.getPixels()[0].length;
+        }
+    }
+
+    class RenderPanel extends JPanel{
+
+        private Color[][] pixels = new Color[][]{};
+
+        public void setPixels(Color[][] pixels){
+            this.pixels = pixels;
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g);
+            g.setColor(new Color(0, 0, 0));
+            g.fillRect(0, 0, WIDTH, HEIGHT);
+            for (int c = 0; c < pixels.length; c++) {
+                for (int r = 0; r < pixels[0].length; r++) {
+                    if (pixels[r][c] == null) {
+                        g.setColor(new Color(0, 0, 0));
+                    } else {
+                        g.setColor(pixels[r][c]);
+                    }
+                    g.drawLine(r, c, r, c);
+                }
+            }
         }
     }
 }
