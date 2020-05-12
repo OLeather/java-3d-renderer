@@ -21,6 +21,11 @@ public class Camera {
         this.vFov = Math.toDegrees(Math.atan(pxHeight / 2 / focalLength));
     }
 
+    public void setCamPosition(Point3D position) {
+        this.position = position;
+    }
+
+
     public void setCamPosition(double x, double y, double z) {
         this.position = new Point3D(x, y, z);
     }
