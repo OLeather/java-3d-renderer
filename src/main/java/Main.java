@@ -67,7 +67,6 @@ public class Main extends TimerTask implements KeyListener {
         sphereObject.setPosition(new Point3D(0, 0, 20));
 
         Renderer.getInstance().addObject(sphereObject);
-        Renderer.getInstance().addObject(cubeObject);
 
         camera.setCamRotationDegrees(new Point3D(0, 15, 0));
         Renderer.getInstance().renderObjects();
