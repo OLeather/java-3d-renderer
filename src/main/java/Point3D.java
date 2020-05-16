@@ -108,7 +108,8 @@ public class Point3D {
 
     /**
      * Returns the normalized vector.
-     * http://www.fundza.com/vectors/normalize/
+     * <p>
+     * Normalized vector calculation from http://www.fundza.com/vectors/normalize/
      *
      * @return
      */

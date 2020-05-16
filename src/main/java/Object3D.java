@@ -25,7 +25,7 @@ public class Object3D {
     /**
      * Generates an {@link Object3D} from an OBJ file. Uses the library "java-data-front" to parse OBJ data.
      * <p>
-     * https://github.com/mokiat/java-data-front
+     * OBJ parser library from https://github.com/mokiat/java-data-front
      *
      * @param filePath
      * @param name

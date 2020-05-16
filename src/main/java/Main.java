@@ -45,10 +45,10 @@ public class Main extends TimerTask implements KeyListener {
         camera.setCamRotationDegrees(0, 0, 0);
 
 
-        //https://people.sc.fsu.edu/~jburkardt/data/obj/cube.obj
+        //File from https://people.sc.fsu.edu/~jburkardt/data/obj/cube.obj
         String cubeFile = "cube.obj";
 
-        //http://web.mit.edu/djwendel/www/weblogo/shapes/basic-shapes/sphere/sphere.obj
+        //File from http://web.mit.edu/djwendel/www/weblogo/shapes/basic-shapes/sphere/sphere.obj
         String sphereFile = "sphere.obj";
 
         //Create a series of test objects

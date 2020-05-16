@@ -116,7 +116,7 @@ public class Camera {
      * Returns the 3D point of intersection of a ray vector from the camera and a plane given the plane normal and a
      * point on the plane.
      * <p>
-     * https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane
+     * Algorithm from https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane
      *
      * @param rayVector   the ray vector from the camera to the desired intersection point.
      * @param planeNormal the normal vector of the plane.

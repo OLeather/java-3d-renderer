@@ -273,7 +273,7 @@ public class Renderer extends JFrame {
     /**
      * Returns whether or not a point is within a triangle.
      * <p>
-     * https://www.geeksforgeeks.org/check-whether-a-given-point-lies-inside-a-triangle-or-not/
+     * Source: https://www.geeksforgeeks.org/check-whether-a-given-point-lies-inside-a-triangle-or-not/
      *
      * @param pt
      * @param triangle
@@ -319,7 +319,7 @@ public class Renderer extends JFrame {
     /**
      * Applies a 3D rotation matrix to the input {@link Point3D}.
      * <p>
-     * Matrix equation from https://en.wikipedia.org/wiki/Rotation_matrix
+     * Rotation matrixes from https://en.wikipedia.org/wiki/Rotation_matrix
      *
      * @param point
      * @param rotation
