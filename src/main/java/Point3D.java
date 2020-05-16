@@ -32,31 +32,73 @@ public class Point3D {
         return new Point3D(appliedMatrix.get(0), appliedMatrix.get(1), appliedMatrix.get(2));
     }
 
+    /**
+     * Returns the distance of this point to another point.
+     *
+     * @param other
+     * @return
+     */
     public double distance(Point3D other) {
         return Math.sqrt(Math.pow(other.getX() - getX(), 2) + Math.pow(other.getY() - getY(), 2) +
                 Math.pow(other.getZ() - getZ(), 2));
     }
 
+    /**
+     * Returns this point added to the other point.
+     *
+     * @param other
+     * @return
+     */
     public Point3D plus(Point3D other) {
         return new Point3D(other.getX() + getX(), other.getY() + getY(), other.getZ() + getZ());
     }
 
+    /**
+     * Returns this point subtracted by the other point
+     *
+     * @param other
+     * @return
+     */
     public Point3D minus(Point3D other) {
-        return new Point3D(other.getX() - getX(), other.getY() - getY(), other.getZ() - getZ());
+        return new Point3D(getX()-other.getX(), getY()-other.getY(), getZ()-other.getZ());
     }
 
+    /**
+     * Returns this point times the other point
+     *
+     * @param other
+     * @return
+     */
     public Point3D times(Point3D other) {
         return new Point3D(other.getX() * getX(), other.getY() * getY(), other.getZ() * getZ());
     }
 
+    /**
+     * Returns this point times a scalar value
+     *
+     * @param scalar
+     * @return
+     */
     public Point3D times(double scalar) {
         return new Point3D(scalar * getX(), scalar * getY(), scalar * getZ());
     }
 
+    /**
+     * Returns the dot product of this point and another point
+     *
+     * @param other
+     * @return
+     */
     public double dot(Point3D other) {
         return other.getX() * getX() + other.getY() * getY() + other.getZ() * getZ();
     }
 
+    /**
+     * Returns the cross product of this point and another point
+     *
+     * @param other
+     * @return
+     */
     public Point3D cross(Point3D other) {
         double newX = y * other.getZ() - z * other.getY();
         double newY = z * other.getX() - x * other.getZ();
@@ -70,9 +112,9 @@ public class Point3D {
      *
      * @return
      */
-    public Point3D normalize(){
+    public Point3D normalize() {
         double length = distance(new Point3D());
-        return new Point3D(x/length, y/length, z/length);
+        return new Point3D(x / length, y / length, z / length);
     }
 
     public double getX() {

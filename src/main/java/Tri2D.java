@@ -11,6 +11,10 @@ public class Tri2D {
         this.v2 = v2;
     }
 
+    /**
+     * Calculates the area of the triangle.
+     * @return
+     */
     public double area() {
         return Math.abs((v0.getX() * (v1.getY() - v2.getY()) + v1.getX() * (v2.getY() - v0.getY()) +
                 v2.getX() * (v0.getY() - v1.getY())) / 2.0);

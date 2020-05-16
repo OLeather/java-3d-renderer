@@ -1,4 +1,3 @@
-import com.mokiat.data.front.error.WFException;
 import com.mokiat.data.front.parser.IOBJParser;
 import com.mokiat.data.front.parser.OBJFace;
 import com.mokiat.data.front.parser.OBJModel;
@@ -7,8 +6,6 @@ import com.mokiat.data.front.parser.OBJParser;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 
 public class Object3D {
@@ -25,56 +22,61 @@ public class Object3D {
         this.color = color;
     }
 
-    public static Object3D rectangle(double width, double height, double length, String name, Color color) {
-        Tri3D[] tris = new Tri3D[]{};
-        return new Object3D(tris, name, color);
-    }
-
+    /**
+     * Generates an {@link Object3D} from an OBJ file. Uses the library "java-data-front" to parse OBJ data.
+     * https://github.com/mokiat/java-data-front
+     *
+     * @param filePath
+     * @param name
+     * @param color
+     * @return
+     */
     public static Object3D fromOBJFile(String filePath, String name, Color color) {
         ArrayList<Tri3D> tris = new ArrayList<>();
-        // Open a stream to your OBJ resource
-        try (InputStream in = new FileInputStream(filePath)) {
-            // Create an OBJParser and parse the resource
-            final IOBJParser parser = new OBJParser();
-            final OBJModel model = parser.parse(in);
 
-            // Use the model representation to get some basic info
-            System.out.println(MessageFormat.format(
-                    "OBJ model has {0} vertices, {1} normals, {2} texture coordinates, and {3} objects.",
-                    model.getVertices().size(),
-                    model.getNormals().size(),
-                    model.getTexCoords().size(),
-                    model.getObjects().size()));
-            for (OBJFace face : model.getObjects().get(0).getMeshes().get(0).getFaces()) {
-//                System.out.println("Face: {");
-//                for (OBJDataReference ref : face.getReferences()) {
-//                    OBJVertex vert = model.getVertex(ref);
-//                    System.out.println(vert.x + " " + vert.y + " " + vert.z);
-//                }
-//                System.out.println("}");
-                Point3D v0 = new Point3D(model.getVertex(face.getReferences().get(0)).x,
-                        model.getVertex(face.getReferences().get(0)).y, model.getVertex(face.getReferences().get(0)).z);
-                Point3D v1 = new Point3D(model.getVertex(face.getReferences().get(1)).x,
-                        model.getVertex(face.getReferences().get(1)).y, model.getVertex(face.getReferences().get(1)).z);
-                Point3D v2 = new Point3D(model.getVertex(face.getReferences().get(2)).x,
-                        model.getVertex(face.getReferences().get(2)).y, model.getVertex(face.getReferences().get(2)).z);
-                tris.add(new Tri3D(v0, v1, v2));
-            }
-        } catch (WFException e) {
-            e.printStackTrace();
+        //Create OBJParser and OBJModel
+        IOBJParser parser = new OBJParser();
+        OBJModel model = null;
+        //Try parsing the OBJ file with the given path
+        try {
+            model = parser.parse(new FileInputStream(filePath));
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        //For each face (triangle), get the 3 vertices and add them to the triangle list
+        for (OBJFace face : model.getObjects().get(0).getMeshes().get(0).getFaces()) {
+            Point3D v0 = new Point3D(model.getVertex(face.getReferences().get(0)).x,
+                    model.getVertex(face.getReferences().get(0)).y, model.getVertex(face.getReferences().get(0)).z);
+            Point3D v1 = new Point3D(model.getVertex(face.getReferences().get(1)).x,
+                    model.getVertex(face.getReferences().get(1)).y, model.getVertex(face.getReferences().get(1)).z);
+            Point3D v2 = new Point3D(model.getVertex(face.getReferences().get(2)).x,
+                    model.getVertex(face.getReferences().get(2)).y, model.getVertex(face.getReferences().get(2)).z);
+            tris.add(new Tri3D(v0, v1, v2));
+        }
+
         return new Object3D(tris.toArray(new Tri3D[]{}), name, color);
     }
 
+    /**
+     * Returns the triangles with the object position, rotation, and scale applied to it
+     *
+     * @return the triangles with the object position, rotation, and scale applied to it
+     */
     public Tri3D[] getPositionedTris() {
         Tri3D[] positionedTris = new Tri3D[tris.length];
+        //Loop through all the tris
         for (int i = 0; i < positionedTris.length; i++) {
+            //Create temporary tri point array to make iterating them easier
             Point3D[] triPoints = new Point3D[]{tris[i].getV0(), tris[i].getV1(), tris[i].getV2()};
+            //Iterate through points of tri
             for (int j = 0; j < triPoints.length; j++) {
+                //Apply rotation. Rotation is applied first because it needs to be rotated around it's local origin
+                //before positioned in world space.
                 triPoints[j] = Renderer.getInstance().apply3DRotationMatrix(triPoints[j], rotation);
+                //Apply position
                 triPoints[j] = Renderer.getInstance().getPointRelativeToPosition(triPoints[j], position);
+                //Apply scale
                 triPoints[j] = triPoints[j].times(scale);
             }
             positionedTris[i] = new Tri3D(triPoints[0], triPoints[1], triPoints[2]);

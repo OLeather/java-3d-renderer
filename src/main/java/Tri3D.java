@@ -15,7 +15,9 @@ public class Tri3D {
     }
 
     /**
-     * @return
+     * Returns the plane normal vector.
+     *
+     * @return the plane normal vector in the form of a {@link Point3D}.
      */
     public Point3D getPlaneNormalVector() {
         Point3D a = v0;

@@ -22,6 +22,7 @@ public class Main extends TimerTask implements KeyListener {
     public static void main(String[] args) {
         Main main = new Main();
         Timer timer = new Timer();
+        //Schedule Main to run at a fixed rate
         timer.scheduleAtFixedRate(main, 0, 20);
     }
 
@@ -29,22 +30,20 @@ public class Main extends TimerTask implements KeyListener {
         init();
     }
 
+    //Initializes the 3D renderer
     public void init() {
+        //Create the camera
         this.camera = new Camera(Renderer.WIDTH, Renderer.HEIGHT, 60);
 
+        //Set the camera to the renderer
         Renderer.getInstance().setCamera(camera);
+        //Add the key listener to the renderer to get keyboard inputs
         Renderer.getInstance().addKeyListener(this);
 
+        //Poisition and rotate the camera
         camera.setCamPosition(0, 0, 0);
         camera.setCamRotationDegrees(0, 0, 0);
 
-        Object3D object3D =
-                new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
-                        "Test OBJ", Color.red);
-
-        Object3D object3D1 =
-                new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
-                        "Test OBJ1", Color.blue);
 
         //https://people.sc.fsu.edu/~jburkardt/data/obj/cube.obj
         String cubeFile = "cube.obj";
@@ -52,28 +51,40 @@ public class Main extends TimerTask implements KeyListener {
         //http://web.mit.edu/djwendel/www/weblogo/shapes/basic-shapes/sphere/sphere.obj
         String sphereFile = "sphere.obj";
 
+        //Create a series of test objects
+        Object3D triObj1 =
+                new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
+                        "Test OBJ", Color.red);
+        Object3D triObj2 =
+                new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
+                        "Test OBJ1", Color.blue);
         Object3D cubeObject = Object3D.fromOBJFile(cubeFile, "cube", Color.GREEN);
-
         Object3D sphereObject = Object3D.fromOBJFile(sphereFile, "sphere", Color.RED);
 
+        //Adjust positions and rotations of test objects
+        triObj1.setPosition(new Point3D(0, 0, 10));
+        triObj1.setRotationDegrees(new Point3D(45, 0, 0));
 
-        object3D.setPosition(new Point3D(0, 0, 10));
-        object3D.setRotationDegrees(new Point3D(45, 0, 0));
-        object3D1.setPosition(new Point3D(0, 2, 20));
+        triObj2.setPosition(new Point3D(0, 2, 20));
 
         cubeObject.setPosition(new Point3D(5, 0, 10));
         cubeObject.setScale(new Point3D(5, 5, 5));
 
         sphereObject.setPosition(new Point3D(0, 0, 20));
 
+        //Add objects to the renderer
         Renderer.getInstance().addObject(sphereObject);
 
-        camera.setCamRotationDegrees(new Point3D(0, 15, 0));
+        //Initial object rendering
         Renderer.getInstance().renderObjects();
     }
 
+    /**
+     * Handles camera movement and updates the renderer.
+     */
     @Override
     public void run() {
+        //Move camera from key presses
         if (forwardPressed) {
             camera.setCamPosition(camera.getPosition().plus(Renderer.getInstance()
                     .apply3DRotationMatrix(new Point3D(0, 0, -camMoveSpeed),
@@ -94,14 +105,12 @@ public class Main extends TimerTask implements KeyListener {
                     .apply3DRotationMatrix(new Point3D(camMoveSpeed, 0, 0),
                             new Point3D(0, camera.getRotation().getY(), Math.PI))));
         }
-
         if (upPressed) {
             camera.setCamPosition(camera.getPosition().plus(new Point3D(0, -camMoveSpeed, 0)));
         }
         if (downPressed) {
             camera.setCamPosition(camera.getPosition().plus(new Point3D(0, camMoveSpeed, 0)));
         }
-
         if (leftRotPressed) {
             camera.setCamRotationRads(camera.getRotation().plus(new Point3D(0, camRotateSpeed, 0)));
         }
@@ -115,7 +124,7 @@ public class Main extends TimerTask implements KeyListener {
             camera.setCamRotationRads(camera.getRotation().plus(new Point3D(-camRotateSpeed, 0, 0)));
         }
 
-
+        //Update rendereer
         Renderer.getInstance().renderObjects();
     }
 
@@ -124,6 +133,9 @@ public class Main extends TimerTask implements KeyListener {
 
     }
 
+    /**
+     * Handles keyboard presses
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyChar() == 'w') {
@@ -158,6 +170,9 @@ public class Main extends TimerTask implements KeyListener {
         }
     }
 
+    /**
+     * Handles keyboard releases
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyChar() == 'w') {

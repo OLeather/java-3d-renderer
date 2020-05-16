@@ -45,6 +45,13 @@ public class Camera {
         this.rotation = new Point3D(Math.toRadians(rotX), Math.toRadians(rotY), Math.toRadians(rotZ));
     }
 
+    /**
+     * Calculates the {@link Point3D} relative to the camera position and rotation. In other words, it gets the point
+     * coordinates if the camera were at position (0,0,0) and rotation (0,0,0).
+     *
+     * @param point input {@link Point3D}.
+     * @return camera relative {@link Point3D}.
+     */
     public Point3D calculateCameraRelativePoint(Point3D point) {
         Point3D output;
         output = new Point3D(point.getX() - position.getX(), point.getY() - position.getY(),
@@ -53,6 +60,12 @@ public class Camera {
         return output;
     }
 
+    /**
+     * Projects a 3D point onto the camera plane.
+     *
+     * @param point3D {@link Point3D} to project.
+     * @return the projected {@link Point2D}.
+     */
     public Point2D project3dPointToCameraPlane(Point3D point3D) {
         Point3D cameraRelativePoint = calculateCameraRelativePoint(point3D);
         double thetaX = Math.atan2(cameraRelativePoint.getX(), cameraRelativePoint.getZ());
@@ -66,6 +79,12 @@ public class Camera {
         return new Point2D.Double(px, py);
     }
 
+    /**
+     * Calculates the 3D ray vector from the camera to a screen point.
+     *
+     * @param screenPoint the screen {@link Point2D} to get the vector to.
+     * @return the 3D ray vector from the camera to a screen point in the form of a {@link Point3D}.
+     */
     public Point3D getRayVectorFromScreenPoint(Point2D screenPoint) {
         double px = screenPoint.getX();
         double py = screenPoint.getY();
@@ -76,24 +95,32 @@ public class Camera {
         return new Point3D(Math.tan(thetaX), Math.tan(thetaY), 1);
     }
 
+    /**
+     * Returns the distance from a screen point to a 3D triangle.
+     *
+     * The 3D triangle must be in camera-relative coordinates. The screen point must be in screen-relative coordinates.
+     *
+     * @param screenPoint screen-relative {@link Point2D}.
+     * @param tri camera-realtive {@link Tri3D}.
+     * @return the distance from the screen point to the triangle.
+     */
     public double getScreenDistanceToPlane(Point2D screenPoint, Tri3D tri) {
         Point3D rayVector = getRayVectorFromScreenPoint(screenPoint);
         Point3D planeNormal = tri.getPlaneNormalVector();
-
         Point3D planePoint = getPlaneRayIntersection(rayVector, planeNormal, tri.getV0());
-
-//        System.out.println(rayVector + " " +  planeNormal);
-
         return planePoint.distance(new Point3D());
     }
 
     /**
+     * Returns the 3D point of intersection of a ray vector from the camera and a plane given the plane normal and a
+     * point on the plane.
+     *
      * https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane
      *
-     * @param rayVector
-     * @param planeNormal
-     * @param planePoint
-     * @return
+     * @param rayVector the ray vector from the camera to the desired intersection point.
+     * @param planeNormal the normal vector of the plane.
+     * @param planePoint a point on the plane.
+     * @return {@link Point3D} of intersection.
      */
     public Point3D getPlaneRayIntersection(Point3D rayVector, Point3D planeNormal, Point3D planePoint) {
         Point3D diff = new Point3D().minus(planePoint);

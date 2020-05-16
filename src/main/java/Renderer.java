@@ -73,68 +73,100 @@ public class Renderer extends JFrame {
         return renderTris;
     }
 
+    /**
+     * Calculates the zbuffer and renders the pixel colors given correct depth.
+     *
+     * @param tris
+     * @param triColors
+     * @return
+     */
     public Color[][] calculateZBuffer(RenderTri[] tris, Color[] triColors) {
+        //Initialize pixels array
         Color[][] pixels = new Color[getWidth()][getHeight()];
+        //Initialize array as all black pixels
         for (int x = 0; x < pixels.length; x++) {
             for (int y = 0; y < pixels[0].length; y++) {
                 pixels[x][y] = new Color(0, 0, 0);
             }
         }
+        //Initialize distances array, used for zbuffer calculation.
         double[][] distances = new double[getWidth()][getHeight()];
+
         int i = 0;
+        //Loop through all render tris
         for (RenderTri renderTri : tris) {
+            //Get the bound box of the render tri
             TriBoundBox box = renderTri.getBoundBox();
+
+            //Get the camera-relative 3D triangle
             Tri3D cameraRelativeTri = new Tri3D(
                     camera.calculateCameraRelativePoint(renderTri.getTri3D().getV0()),
                     camera.calculateCameraRelativePoint(renderTri.getTri3D().getV1()),
                     camera.calculateCameraRelativePoint(renderTri.getTri3D().getV2())
             );
 
+            //Compute the shade value given the camera-relative tri normal vector skew angles. This is a very rough way
+            //of computing shading, but doesn't look too bad.
             Point3D normal = cameraRelativeTri.getPlaneNormalVector();
-
             double xSkew = 1 - Math.abs(Math.atan(normal.getX()));
             double ySkew = 1 - Math.abs(Math.atan(normal.getY()));
-
             double shadeValue = (xSkew + ySkew) / 2;
 
+            //Caps the shade value between 0 and 1
             shadeValue = Math.min(1, Math.max(0, shadeValue));
 
+            //Loops through all pixels
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
                 for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
+                    //Checks to see if pixel is within triangle and therefore should be rendered
                     if (box.getPixels()[x - box.getX()][y - box.getY()]) {
+                        //Checks to make sure pixel is actually on the screen. Otherwise, don't render it.
                         if (x > 0 && x < WIDTH && y > 0 && y < HEIGHT) {
+                            //Get the distance to the triangle
                             double distance =
                                     camera.getScreenDistanceToPlane(screenToCameraCoordinate(new Point2D.Double(x, y)),
                                             cameraRelativeTri);
 
+                            //Debug color calculations. This will return a black and white color shaded based on it's
+                            //depth to the camera. Used to debug zbuffer calculations. The darker the color, the
+                            //further from the camera.
                             double debugMaxDistance = 100;
                             int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
                             Color debugColor = new Color(v, v, v);
-                            if (pixels[x][y].equals(new Color(0, 0, 0))) {
-                                pixels[x][y] = new Color((int) (triColors[i].getRed() * shadeValue),
-                                        (int) (triColors[i].getBlue() * shadeValue),
-                                        (int) (triColors[i].getGreen() * shadeValue));
-//                                pixels[x][y] = debugColor;
+
+                            Color color = new Color((int) (triColors[i].getRed() * shadeValue),
+                                    (int) (triColors[i].getBlue() * shadeValue),
+                                    (int) (triColors[i].getGreen() * shadeValue));
+
+                            //If no other pixel has been drawn here yet, draw the pixel. If a pixel has been drawn
+                            // already, only draw the pixel if it is closer to the camera than the previously drawn
+                            // pixel, therefore drawing it on top.
+                            if (pixels[x][y].equals(new Color(0, 0, 0)) || distance < distances[x][y]) {
+                                //Draw the pixel color
+                                pixels[x][y] = color;
+                                //Update the distance
                                 distances[x][y] = distance;
-                            } else {
-                                if (distance < distances[x][y]) {
-                                    pixels[x][y] = new Color((int) (triColors[i].getRed() * shadeValue),
-                                            (int) (triColors[i].getBlue() * shadeValue),
-                                            (int) (triColors[i].getGreen() * shadeValue));
-//                                    pixels[x][y] = debugColor;
-                                    distances[x][y] = distance;
-                                }
                             }
                         }
                     }
                 }
             }
+            //Iterate loop counter
             i++;
-
         }
+
+        //Return rendered pixels
         return pixels;
     }
 
+    /**
+     * Projects a 3D triangle onto a 2D camera plane.
+     * <p>
+     * This loops through the points of the 3D triangle and draws them onto a 2D plane.
+     *
+     * @param tri3D the input {@link Tri3D}.
+     * @return the projected {@link Tri2D}.
+     */
     public Tri2D projectTri3DTo2D(Tri3D tri3D) {
         return new Tri2D(camera.project3dPointToCameraPlane(tri3D.getV0()),
                 camera.project3dPointToCameraPlane(tri3D.getV1()),
@@ -189,39 +221,52 @@ public class Renderer extends JFrame {
         Point2D[] points =
                 new Point2D[]{cameraToScreenCoordinate(tri2D.getV0()), cameraToScreenCoordinate(tri2D.getV1()),
                         cameraToScreenCoordinate(tri2D.getV2())};
-        //Loop through all points once to get the bound X
+        //Loop through all points
         for (Point2D p : points) {
+            //If x value is less than current bound x, update bound x to the current x value.
             if (p.getX() < boundX) {
                 boundX = (int) p.getX();
             }
+            //If y value is less than the current bound y, update bound y to the current y value.
             if (p.getY() < boundY) {
                 boundY = (int) p.getY();
             }
+            //If x value is greater than the current boundXBottom, update boundXBottom to the current x value.
             if (p.getX() > boundXBottom) {
                 boundXBottom = (int) p.getX();
             }
+            //If y value is greater than the current boundYBottom, update boundYBottom to the current y value.
             if (p.getY() > boundYBottom) {
                 boundYBottom = (int) p.getY();
             }
         }
+
+        //Initialize tri pixels array.
         boolean[][] triPixels = new boolean[0][0];
+
+        //Calculate the width and height of the bound box.
         int boundWidth = Math.abs(boundXBottom - boundX);
         int boundHeight = Math.abs(boundYBottom - boundY);
 
-        if(!(boundX > WIDTH || boundY > HEIGHT) && !(boundX + boundWidth < 0 || boundY + boundHeight < 0) && boundWidth < 5000 && boundHeight < 5000) {
+        //Determine whether the triangle should be drawn. This checks that the bound box is on the screen and also
+        // that it is within a certain size threshold.
+        if (!(boundX > WIDTH || boundY > HEIGHT) && !(boundX + boundWidth < 0 || boundY + boundHeight < 0) &&
+                boundWidth < 5000 && boundHeight < 5000) {
 
-            //Calculate width and height for bound box given bound coordinates and bound bottom coordinates
-
+            //Initialzie new tri pixels array given the new bound width and height
             triPixels = new boolean[boundWidth][boundHeight];
 
+            //Loop through all x and y values of the pixels
             for (int x = 0; x < triPixels.length; x++) {
                 for (int y = 0; y < triPixels[0].length; y++) {
+                    //Set the pixel to either true or false depending on whether the pixel is within the triangle.
                     triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY),
                             new Tri2D(points[0], points[1], points[2]));
                 }
             }
         }
 
+        //Return the triangle bound box.
         return new TriBoundBox(triPixels, boundX, boundY);
     }
 
@@ -303,11 +348,10 @@ public class Renderer extends JFrame {
         });
 
         Point3D outputPoint;
-        //Apply z, y, and x rotation matrix respectively
+        //Apply y, x, and z rotation matrix respectively
         outputPoint = Point3D.applyMatrix(point, rotYMatrix);
         outputPoint = Point3D.applyMatrix(outputPoint, rotXMatrix);
         outputPoint = Point3D.applyMatrix(outputPoint, rotZMatrix);
-
 
         //Return rotated points
         return outputPoint;
