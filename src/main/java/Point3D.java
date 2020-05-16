@@ -60,7 +60,7 @@ public class Point3D {
      * @return
      */
     public Point3D minus(Point3D other) {
-        return new Point3D(getX()-other.getX(), getY()-other.getY(), getZ()-other.getZ());
+        return new Point3D(getX() - other.getX(), getY() - other.getY(), getZ() - other.getZ());
     }
 
     /**

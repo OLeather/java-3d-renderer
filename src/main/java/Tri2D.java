@@ -13,6 +13,7 @@ public class Tri2D {
 
     /**
      * Calculates the area of the triangle.
+     *
      * @return
      */
     public double area() {

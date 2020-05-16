@@ -34,7 +34,8 @@ public class Camera {
     }
 
     public void setCamRotationDegrees(Point3D rotation) {
-        this.rotation = new Point3D(Math.toRadians(rotation.getX()),Math.toRadians(rotation.getY()),Math.toRadians(rotation.getZ()));
+        this.rotation = new Point3D(Math.toRadians(rotation.getX()), Math.toRadians(rotation.getY()),
+                Math.toRadians(rotation.getZ()));
     }
 
     public void setCamRotationRads(Point3D rotation) {
@@ -97,11 +98,11 @@ public class Camera {
 
     /**
      * Returns the distance from a screen point to a 3D triangle.
-     *
+     * <p>
      * The 3D triangle must be in camera-relative coordinates. The screen point must be in screen-relative coordinates.
      *
      * @param screenPoint screen-relative {@link Point2D}.
-     * @param tri camera-realtive {@link Tri3D}.
+     * @param tri         camera-realtive {@link Tri3D}.
      * @return the distance from the screen point to the triangle.
      */
     public double getScreenDistanceToPlane(Point2D screenPoint, Tri3D tri) {
@@ -114,12 +115,12 @@ public class Camera {
     /**
      * Returns the 3D point of intersection of a ray vector from the camera and a plane given the plane normal and a
      * point on the plane.
-     *
+     * <p>
      * https://rosettacode.org/wiki/Find_the_intersection_of_a_line_with_a_plane
      *
-     * @param rayVector the ray vector from the camera to the desired intersection point.
+     * @param rayVector   the ray vector from the camera to the desired intersection point.
      * @param planeNormal the normal vector of the plane.
-     * @param planePoint a point on the plane.
+     * @param planePoint  a point on the plane.
      * @return {@link Point3D} of intersection.
      */
     public Point3D getPlaneRayIntersection(Point3D rayVector, Point3D planeNormal, Point3D planePoint) {

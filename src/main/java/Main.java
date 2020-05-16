@@ -19,15 +19,15 @@ public class Main extends TimerTask implements KeyListener {
     private double camMoveSpeed = 0.5;
     private double camRotateSpeed = 0.02;
 
+    public Main() {
+        init();
+    }
+
     public static void main(String[] args) {
         Main main = new Main();
         Timer timer = new Timer();
         //Schedule Main to run at a fixed rate
         timer.scheduleAtFixedRate(main, 0, 20);
-    }
-
-    public Main() {
-        init();
     }
 
     //Initializes the 3D renderer
