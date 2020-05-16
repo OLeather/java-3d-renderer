@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class Renderer extends JFrame {
-    private static final int WIDTH = 800;
-    private static final int HEIGHT = 800;
+    public static final int WIDTH = 800;
+    public static final int HEIGHT = 800;
     private static Renderer instance = new Renderer();
     private ArrayList<Object3D> objects = new ArrayList<>();
     private Color[][] pixelColors = new Color[WIDTH][HEIGHT];
@@ -84,20 +84,30 @@ public class Renderer extends JFrame {
         int i = 0;
         for (RenderTri renderTri : tris) {
             TriBoundBox box = renderTri.getBoundBox();
+            Tri3D cameraRelativeTri = new Tri3D(
+                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV0()),
+                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV1()),
+                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV2())
+            );
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
                 for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
                     if (box.getPixels()[x - box.getX()][y - box.getY()]) {
-                        double distance =
-                                camera.getScreenDistanceToPlane(new Point2D.Double(x, y), renderTri.getTri3D());
-//                        double debugMaxDistance = 50;
-//                        Color debugColor = new Color(255, 255, 255, Math.min(Math.max(255-(int)(distance/debugMaxDistance*255),0),255));
-                        if (pixels[x][y].equals(new Color(0, 0, 0))) {
-                            pixels[x][y] = triColors[i];
-                            distances[x][y] = distance;
-                        } else {
-                            if (distance < distances[x][y]) {
+                        if (x > 0 && x < WIDTH && y > 0 && y < HEIGHT) {
+                            double distance =
+                                    camera.getScreenDistanceToPlane(screenToCameraCoordinate(new Point2D.Double(x, y)), cameraRelativeTri);
+                            double debugMaxDistance = 100;
+                            int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
+                            Color debugColor = new Color(v, v, v);
+                            if (pixels[x][y].equals(new Color(0, 0, 0))) {
                                 pixels[x][y] = triColors[i];
+//                                pixels[x][y] = debugColor;
                                 distances[x][y] = distance;
+                            } else {
+                                if (distance < distances[x][y]) {
+                                pixels[x][y] = triColors[i];
+//                                    pixels[x][y] = debugColor;
+                                    distances[x][y] = distance;
+                                }
                             }
                         }
                     }
@@ -222,6 +232,17 @@ public class Renderer extends JFrame {
         return new Point2D.Double(point.getX() + getWidth() / 2, -point.getY() + getHeight() / 2);
     }
 
+    /**
+     * Gets the camera coordinates with (0,0) in the middle from a camera coordinate with (0,0) at the top left
+     * of the screen.
+     *
+     * @param point
+     * @return
+     */
+    public Point2D screenToCameraCoordinate(Point2D point) {
+        return new Point2D.Double(point.getX() - getWidth() / 2, -(point.getY() - getHeight() / 2));
+    }
+
     public Point3D getPointRelativeToPosition(Point3D point, Point3D position) {
         return new Point3D(
                 point.getX() - position.getX(),
@@ -261,10 +282,11 @@ public class Renderer extends JFrame {
         });
 
         Point3D outputPoint;
-        //Apply x, y, and z rotation matrix respectively
-        outputPoint = Point3D.applyMatrix(point, rotXMatrix);
-        outputPoint = Point3D.applyMatrix(outputPoint, rotYMatrix);
+        //Apply z, y, and x rotation matrix respectively
+        outputPoint = Point3D.applyMatrix(point, rotYMatrix);
+        outputPoint = Point3D.applyMatrix(outputPoint, rotXMatrix);
         outputPoint = Point3D.applyMatrix(outputPoint, rotZMatrix);
+
 
         //Return rotated points
         return outputPoint;
@@ -418,11 +440,11 @@ public class Renderer extends JFrame {
         }
     }
 
-    class RenderPanel extends JPanel{
+    class RenderPanel extends JPanel {
 
         private Color[][] pixels = new Color[][]{};
 
-        public void setPixels(Color[][] pixels){
+        public void setPixels(Color[][] pixels) {
             this.pixels = pixels;
         }
 

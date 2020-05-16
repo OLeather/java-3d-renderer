@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -13,7 +12,12 @@ public class Main extends TimerTask implements KeyListener {
     private boolean rightPressed = false;
     private boolean upPressed = false;
     private boolean downPressed = false;
+    private boolean leftRotPressed = false;
+    private boolean rightRotPressed = false;
+    private boolean upRotPressed = false;
+    private boolean downRotPressed = false;
     private double camMoveSpeed = 0.5;
+    private double camRotateSpeed = 0.02;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -21,12 +25,12 @@ public class Main extends TimerTask implements KeyListener {
         timer.scheduleAtFixedRate(main, 0, 20);
     }
 
-    public Main(){
+    public Main() {
         init();
     }
 
-    public void init(){
-        this.camera = new Camera(Renderer.getInstance().getWidth(), Renderer.getInstance().getHeight(), 60);
+    public void init() {
+        this.camera = new Camera(Renderer.WIDTH, Renderer.HEIGHT, 60);
 
         Renderer.getInstance().setCamera(camera);
         Renderer.getInstance().addKeyListener(this);
@@ -43,37 +47,60 @@ public class Main extends TimerTask implements KeyListener {
                         "Test OBJ1", Color.blue);
 
         object3D.setPosition(new Point3D(0, 0, 10));
-        object3D.setRotationDegrees(new Point3D(45, 45, 0));
+        object3D.setRotationDegrees(new Point3D(45, 0, 0));
 
         object3D1.setPosition(new Point3D(0, 2, 20));
 
         Renderer.getInstance().addObject(object3D);
         Renderer.getInstance().addObject(object3D1);
 
-
+        camera.setCamRotationDegrees(new Point3D(0, 15, 0));
+        Renderer.getInstance().renderObjects();
     }
 
     @Override
     public void run() {
-        if(forwardPressed){
-            camera.setCamPosition(camera.getPosition().plus(new Point3D(0, 0, -camMoveSpeed)));
+        if (forwardPressed) {
+            camera.setCamPosition(camera.getPosition().plus(Renderer.getInstance()
+                    .apply3DRotationMatrix(new Point3D(0, 0, -camMoveSpeed),
+                            new Point3D(0, camera.getRotation().getY(), Math.PI))));
         }
-        if(backwardPressed){
-            camera.setCamPosition(camera.getPosition().plus(new Point3D(0, 0, camMoveSpeed)));
+        if (backwardPressed) {
+            camera.setCamPosition(camera.getPosition().plus(Renderer.getInstance()
+                    .apply3DRotationMatrix(new Point3D(0, 0, camMoveSpeed),
+                            new Point3D(0, camera.getRotation().getY(), Math.PI))));
         }
-        if(leftPressed){
-            camera.setCamPosition(camera.getPosition().plus(new Point3D(camMoveSpeed, 0, 0)));
+        if (leftPressed) {
+            camera.setCamPosition(camera.getPosition().plus(Renderer.getInstance()
+                    .apply3DRotationMatrix(new Point3D(-camMoveSpeed, 0, 0),
+                            new Point3D(0, camera.getRotation().getY(), Math.PI))));
         }
-        if(rightPressed){
-            camera.setCamPosition(camera.getPosition().plus(new Point3D(-camMoveSpeed, 0, 0)));
+        if (rightPressed) {
+            camera.setCamPosition(camera.getPosition().plus(Renderer.getInstance()
+                    .apply3DRotationMatrix(new Point3D(camMoveSpeed, 0, 0),
+                            new Point3D(0, camera.getRotation().getY(), Math.PI))));
         }
 
-        if(upPressed){
+        if (upPressed) {
             camera.setCamPosition(camera.getPosition().plus(new Point3D(0, -camMoveSpeed, 0)));
         }
-        if(downPressed){
+        if (downPressed) {
             camera.setCamPosition(camera.getPosition().plus(new Point3D(0, camMoveSpeed, 0)));
         }
+
+        if (leftRotPressed) {
+            camera.setCamRotationRads(camera.getRotation().plus(new Point3D(0, camRotateSpeed, 0)));
+        }
+        if (rightRotPressed) {
+            camera.setCamRotationRads(camera.getRotation().plus(new Point3D(0, -camRotateSpeed, 0)));
+        }
+        if (upRotPressed) {
+            camera.setCamRotationRads(camera.getRotation().plus(new Point3D(camRotateSpeed, 0, 0)));
+        }
+        if (downRotPressed) {
+            camera.setCamRotationRads(camera.getRotation().plus(new Point3D(-camRotateSpeed, 0, 0)));
+        }
+
 
         Renderer.getInstance().renderObjects();
     }
@@ -85,45 +112,69 @@ public class Main extends TimerTask implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(e.getKeyChar() == 'w'){
+        if (e.getKeyChar() == 'w') {
             forwardPressed = true;
         }
-        if(e.getKeyChar() == 's'){
+        if (e.getKeyChar() == 's') {
             backwardPressed = true;
         }
-        if(e.getKeyChar() == 'a'){
+        if (e.getKeyChar() == 'a') {
             leftPressed = true;
         }
-        if(e.getKeyChar() == 'd'){
+        if (e.getKeyChar() == 'd') {
             rightPressed = true;
         }
-        if(e.getKeyCode() == 32){
+        if (e.getKeyCode() == 32) {
             upPressed = true;
         }
-        if(e.getKeyCode() == 16){
+        if (e.getKeyCode() == 16) {
             downPressed = true;
+        }
+        if (e.getKeyCode() == 37) {
+            leftRotPressed = true;
+        }
+        if (e.getKeyCode() == 39) {
+            rightRotPressed = true;
+        }
+        if (e.getKeyCode() == 38) {
+            upRotPressed = true;
+        }
+        if (e.getKeyCode() == 40) {
+            downRotPressed = true;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if(e.getKeyChar() == 'w'){
+        if (e.getKeyChar() == 'w') {
             forwardPressed = false;
         }
-        if(e.getKeyChar() == 's'){
+        if (e.getKeyChar() == 's') {
             backwardPressed = false;
         }
-        if(e.getKeyChar() == 'a'){
+        if (e.getKeyChar() == 'a') {
             leftPressed = false;
         }
-        if(e.getKeyChar() == 'd'){
+        if (e.getKeyChar() == 'd') {
             rightPressed = false;
         }
-        if(e.getKeyCode() == 32){
+        if (e.getKeyCode() == 32) {
             upPressed = false;
         }
-        if(e.getKeyCode() == 16){
+        if (e.getKeyCode() == 16) {
             downPressed = false;
+        }
+        if (e.getKeyCode() == 37) {
+            leftRotPressed = false;
+        }
+        if (e.getKeyCode() == 39) {
+            rightRotPressed = false;
+        }
+        if (e.getKeyCode() == 38) {
+            upRotPressed = false;
+        }
+        if (e.getKeyCode() == 40) {
+            downRotPressed = false;
         }
     }
 }

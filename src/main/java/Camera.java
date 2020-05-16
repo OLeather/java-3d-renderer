@@ -25,13 +25,20 @@ public class Camera {
         this.position = position;
     }
 
-
     public void setCamPosition(double x, double y, double z) {
         this.position = new Point3D(x, y, z);
     }
 
     public void setCamRotationRads(double rotX, double rotY, double rotZ) {
         this.rotation = new Point3D(rotX, rotY, rotZ);
+    }
+
+    public void setCamRotationDegrees(Point3D rotation) {
+        this.rotation = new Point3D(Math.toRadians(rotation.getX()),Math.toRadians(rotation.getY()),Math.toRadians(rotation.getZ()));
+    }
+
+    public void setCamRotationRads(Point3D rotation) {
+        this.rotation = rotation;
     }
 
     public void setCamRotationDegrees(double rotX, double rotY, double rotZ) {
@@ -66,7 +73,7 @@ public class Camera {
         double thetaX = Math.atan2(px, focalLength);
         double thetaY = Math.atan2(py, focalLength);
 
-        return new Point3D(Math.tan(thetaX), Math.tan(thetaY), -1);
+        return new Point3D(Math.tan(thetaX), Math.tan(thetaY), 1);
     }
 
     public double getScreenDistanceToPlane(Point2D screenPoint, Tri3D tri) {
@@ -74,6 +81,8 @@ public class Camera {
         Point3D planeNormal = tri.getPlaneNormalVector();
 
         Point3D planePoint = getPlaneRayIntersection(rayVector, planeNormal, tri.getV0());
+
+//        System.out.println(rayVector + " " +  planeNormal);
 
         return planePoint.distance(new Point3D());
     }

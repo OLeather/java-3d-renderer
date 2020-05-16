@@ -3,6 +3,11 @@ public class Tri3D {
     private Point3D v1;
     private Point3D v2;
 
+    public Tri3D() {
+        this(new Point3D(), new Point3D(), new Point3D());
+    }
+
+
     public Tri3D(Point3D v0, Point3D v1, Point3D v2) {
         this.v0 = v0;
         this.v1 = v1;
@@ -18,7 +23,7 @@ public class Tri3D {
         Point3D c = v2;
         Point3D dir = b.minus(a).cross(c.minus(a));
 
-        return dir;
+        return dir.normalize();
     }
 
     public Point3D getV0() {

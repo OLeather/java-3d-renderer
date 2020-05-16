@@ -64,6 +64,17 @@ public class Point3D {
         return new Point3D(newX, newY, newZ);
     }
 
+    /**
+     * Returns the normalized vector.
+     * http://www.fundza.com/vectors/normalize/
+     *
+     * @return
+     */
+    public Point3D normalize(){
+        double length = distance(new Point3D());
+        return new Point3D(x/length, y/length, z/length);
+    }
+
     public double getX() {
         return x;
     }
