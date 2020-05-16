@@ -89,6 +89,19 @@ public class Renderer extends JFrame {
                     camera.calculateCameraRelativePoint(renderTri.getTri3D().getV1()),
                     camera.calculateCameraRelativePoint(renderTri.getTri3D().getV2())
             );
+
+            Point3D normal = cameraRelativeTri.getPlaneNormalVector();
+
+            double xSkew = 1-Math.abs(Math.atan(normal.getX()));
+            double ySkew = 1-Math.abs(Math.atan(normal.getY()));
+
+            double shadeValue = (xSkew + ySkew)/2;
+
+            shadeValue = Math.min(1, Math.max(0, shadeValue));
+
+//            System.out.println(xSkew +  " " + ySkew + " " + shadeValue);
+
+
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
                 for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
                     if (box.getPixels()[x - box.getX()][y - box.getY()]) {
@@ -99,12 +112,12 @@ public class Renderer extends JFrame {
                             int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
                             Color debugColor = new Color(v, v, v);
                             if (pixels[x][y].equals(new Color(0, 0, 0))) {
-                                pixels[x][y] = triColors[i];
+                                pixels[x][y] = new Color((int)(triColors[i].getRed()*shadeValue), (int)(triColors[i].getBlue()*shadeValue), (int)(triColors[i].getGreen()*shadeValue));
 //                                pixels[x][y] = debugColor;
                                 distances[x][y] = distance;
                             } else {
                                 if (distance < distances[x][y]) {
-                                pixels[x][y] = triColors[i];
+                                    pixels[x][y] = new Color((int)(triColors[i].getRed()*shadeValue), (int)(triColors[i].getBlue()*shadeValue), (int)(triColors[i].getGreen()*shadeValue));
 //                                    pixels[x][y] = debugColor;
                                     distances[x][y] = distance;
                                 }

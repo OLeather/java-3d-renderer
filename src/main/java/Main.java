@@ -46,13 +46,21 @@ public class Main extends TimerTask implements KeyListener {
                 new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
                         "Test OBJ1", Color.blue);
 
+        Object3D cubeObject = Object3D.fromOBJFile("cube.obj", "cube", Color.RED);
+
+
         object3D.setPosition(new Point3D(0, 0, 10));
         object3D.setRotationDegrees(new Point3D(45, 0, 0));
 
         object3D1.setPosition(new Point3D(0, 2, 20));
 
-        Renderer.getInstance().addObject(object3D);
-        Renderer.getInstance().addObject(object3D1);
+        cubeObject.setPosition(new Point3D(0, 0, 5));
+
+        cubeObject.setScale(new Point3D(2, 2, 2));
+
+//        Renderer.getInstance().addObject(object3D);
+//        Renderer.getInstance().addObject(object3D1);
+        Renderer.getInstance().addObject(cubeObject);
 
         camera.setCamRotationDegrees(new Point3D(0, 15, 0));
         Renderer.getInstance().renderObjects();
