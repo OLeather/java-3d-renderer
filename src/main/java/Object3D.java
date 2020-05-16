@@ -17,7 +17,7 @@ public class Object3D {
     private Color color;
     private Point3D position = new Point3D(0, 0, 0);
     private Point3D rotation = new Point3D(0, 0, 0);
-    private Point3D scale = new Point3D(0, 0, 0);
+    private Point3D scale = new Point3D(1, 1, 1);
 
     public Object3D(Tri3D[] tris, String name, Color color) {
         this.tris = tris;

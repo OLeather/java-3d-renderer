@@ -92,32 +92,35 @@ public class Renderer extends JFrame {
 
             Point3D normal = cameraRelativeTri.getPlaneNormalVector();
 
-            double xSkew = 1-Math.abs(Math.atan(normal.getX()));
-            double ySkew = 1-Math.abs(Math.atan(normal.getY()));
+            double xSkew = 1 - Math.abs(Math.atan(normal.getX()));
+            double ySkew = 1 - Math.abs(Math.atan(normal.getY()));
 
-            double shadeValue = (xSkew + ySkew)/2;
+            double shadeValue = (xSkew + ySkew) / 2;
 
             shadeValue = Math.min(1, Math.max(0, shadeValue));
-
-//            System.out.println(xSkew +  " " + ySkew + " " + shadeValue);
-
 
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
                 for (int y = box.getY(); y < box.getY() + box.getHeight(); y++) {
                     if (box.getPixels()[x - box.getX()][y - box.getY()]) {
                         if (x > 0 && x < WIDTH && y > 0 && y < HEIGHT) {
                             double distance =
-                                    camera.getScreenDistanceToPlane(screenToCameraCoordinate(new Point2D.Double(x, y)), cameraRelativeTri);
+                                    camera.getScreenDistanceToPlane(screenToCameraCoordinate(new Point2D.Double(x, y)),
+                                            cameraRelativeTri);
+
                             double debugMaxDistance = 100;
                             int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
                             Color debugColor = new Color(v, v, v);
                             if (pixels[x][y].equals(new Color(0, 0, 0))) {
-                                pixels[x][y] = new Color((int)(triColors[i].getRed()*shadeValue), (int)(triColors[i].getBlue()*shadeValue), (int)(triColors[i].getGreen()*shadeValue));
+                                pixels[x][y] = new Color((int) (triColors[i].getRed() * shadeValue),
+                                        (int) (triColors[i].getBlue() * shadeValue),
+                                        (int) (triColors[i].getGreen() * shadeValue));
 //                                pixels[x][y] = debugColor;
                                 distances[x][y] = distance;
                             } else {
                                 if (distance < distances[x][y]) {
-                                    pixels[x][y] = new Color((int)(triColors[i].getRed()*shadeValue), (int)(triColors[i].getBlue()*shadeValue), (int)(triColors[i].getGreen()*shadeValue));
+                                    pixels[x][y] = new Color((int) (triColors[i].getRed() * shadeValue),
+                                            (int) (triColors[i].getBlue() * shadeValue),
+                                            (int) (triColors[i].getGreen() * shadeValue));
 //                                    pixels[x][y] = debugColor;
                                     distances[x][y] = distance;
                                 }
@@ -127,6 +130,7 @@ public class Renderer extends JFrame {
                 }
             }
             i++;
+
         }
         return pixels;
     }
@@ -200,17 +204,21 @@ public class Renderer extends JFrame {
                 boundYBottom = (int) p.getY();
             }
         }
-
-        //Calculate width and height for bound box given bound coordinates and bound bottom coordinates
+        boolean[][] triPixels = new boolean[0][0];
         int boundWidth = Math.abs(boundXBottom - boundX);
         int boundHeight = Math.abs(boundYBottom - boundY);
 
-        boolean[][] triPixels = new boolean[boundWidth][boundHeight];
+        if(!(boundX > WIDTH || boundY > HEIGHT) && !(boundX + boundWidth < 0 || boundY + boundHeight < 0) && boundWidth < 5000 && boundHeight < 5000) {
 
-        for (int x = 0; x < triPixels.length; x++) {
-            for (int y = 0; y < triPixels[0].length; y++) {
-                triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY),
-                        new Tri2D(points[0], points[1], points[2]));
+            //Calculate width and height for bound box given bound coordinates and bound bottom coordinates
+
+            triPixels = new boolean[boundWidth][boundHeight];
+
+            for (int x = 0; x < triPixels.length; x++) {
+                for (int y = 0; y < triPixels[0].length; y++) {
+                    triPixels[x][y] = pointInTriangle(new Point2D.Double(x + boundX, y + boundY),
+                            new Tri2D(points[0], points[1], points[2]));
+                }
             }
         }
 

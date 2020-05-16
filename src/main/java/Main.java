@@ -46,20 +46,27 @@ public class Main extends TimerTask implements KeyListener {
                 new Object3D(new Tri3D[]{new Tri3D(new Point3D(0, 0, 0), new Point3D(5, 5, 0), new Point3D(0, 5, 0))},
                         "Test OBJ1", Color.blue);
 
-        Object3D cubeObject = Object3D.fromOBJFile("cube.obj", "cube", Color.RED);
+        //https://people.sc.fsu.edu/~jburkardt/data/obj/cube.obj
+        String cubeFile = "cube.obj";
+
+        //http://web.mit.edu/djwendel/www/weblogo/shapes/basic-shapes/sphere/sphere.obj
+        String sphereFile = "sphere.obj";
+
+        Object3D cubeObject = Object3D.fromOBJFile(cubeFile, "cube", Color.GREEN);
+
+        Object3D sphereObject = Object3D.fromOBJFile(sphereFile, "sphere", Color.RED);
 
 
         object3D.setPosition(new Point3D(0, 0, 10));
         object3D.setRotationDegrees(new Point3D(45, 0, 0));
-
         object3D1.setPosition(new Point3D(0, 2, 20));
 
-        cubeObject.setPosition(new Point3D(0, 0, 5));
+        cubeObject.setPosition(new Point3D(5, 0, 10));
+        cubeObject.setScale(new Point3D(5, 5, 5));
 
-        cubeObject.setScale(new Point3D(2, 2, 2));
+        sphereObject.setPosition(new Point3D(0, 0, 20));
 
-//        Renderer.getInstance().addObject(object3D);
-//        Renderer.getInstance().addObject(object3D1);
+        Renderer.getInstance().addObject(sphereObject);
         Renderer.getInstance().addObject(cubeObject);
 
         camera.setCamRotationDegrees(new Point3D(0, 15, 0));
