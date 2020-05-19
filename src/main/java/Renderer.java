@@ -92,28 +92,17 @@ public class Renderer extends JFrame {
         //Initialize distances array, used for zbuffer calculation.
         double[][] distances = new double[getWidth()][getHeight()];
 
-        int i = 0;
         //Loop through all render tris
-        for (RenderTri renderTri : tris) {
+        for (int i = 0; i < tris.length; i++) {
+            //Get current render tri
+            RenderTri renderTri = tris[i];
             //Get the bound box of the render tri
             TriBoundBox box = renderTri.getBoundBox();
 
             //Get the camera-relative 3D triangle
-            Tri3D cameraRelativeTri = new Tri3D(
-                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV0()),
-                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV1()),
-                    camera.calculateCameraRelativePoint(renderTri.getTri3D().getV2())
-            );
-
-            //Compute the shade value given the camera-relative tri normal vector skew angles. This is a very rough way
-            //of computing shading, but doesn't look too bad.
-            Point3D normal = cameraRelativeTri.getPlaneNormalVector();
-            double xSkew = 1 - Math.abs(Math.atan(normal.getX()));
-            double ySkew = 1 - Math.abs(Math.atan(normal.getY()));
-            double shadeValue = (xSkew + ySkew) / 2;
-
-            //Caps the shade value between 0 and 1
-            shadeValue = Math.min(1, Math.max(0, shadeValue));
+            Tri3D cameraRelativeTri = getCameraRelativeTri3D(renderTri.getTri3D());
+            //Calculate shade value
+            double shadeValue = calculateShadeValue(cameraRelativeTri);
 
             //Loops through all pixels
             for (int x = box.getX(); x < box.getX() + box.getWidth(); x++) {
@@ -127,20 +116,13 @@ public class Renderer extends JFrame {
                                     camera.getScreenDistanceToPlane(screenToCameraCoordinate(new Point2D.Double(x, y)),
                                             cameraRelativeTri);
 
-                            //Debug color calculations. This will return a black and white color shaded based on it's
-                            //depth to the camera. Used to debug zbuffer calculations. The darker the color, the
-                            //further from the camera.
-                            double debugMaxDistance = 100;
-                            int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
-                            Color debugColor = new Color(v, v, v);
-
                             Color color = new Color((int) (triColors[i].getRed() * shadeValue),
                                     (int) (triColors[i].getBlue() * shadeValue),
                                     (int) (triColors[i].getGreen() * shadeValue));
 
                             //If no other pixel has been drawn here yet, draw the pixel. If a pixel has been drawn
-                            // already, only draw the pixel if it is closer to the camera than the previously drawn
-                            // pixel, therefore drawing it on top.
+                            //already, only draw the pixel if it is closer to the camera than the previously drawn
+                            //pixel, therefore drawing it on top.
                             if (pixels[x][y].equals(new Color(0, 0, 0)) || distance < distances[x][y]) {
                                 //Draw the pixel color
                                 pixels[x][y] = color;
@@ -151,12 +133,59 @@ public class Renderer extends JFrame {
                     }
                 }
             }
-            //Iterate loop counter
-            i++;
         }
 
         //Return rendered pixels
         return pixels;
+    }
+
+    /**
+     * Returns a black and white color shaded based on it's depth to the camera.
+     *
+     * Used to debug xbuffer calculations. The darker the color, the further from the camera.
+     *
+     * @param distance
+     * @param debugMaxDistance
+     * @return
+     */
+    private Color getZBufferDebugColor(double distance, double debugMaxDistance){
+        //Calculate value of color
+        int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
+        return new Color(v, v, v);
+    }
+
+    /**
+     * Calculates the shading value of the input camera-relative {@link Tri3D} based on it's normal vector.
+     *
+     * @param cameraRelativeTri3D camera-relative {@link Tri3D}
+     * @return shading value between 0 and 1. 0 means darker and 1 means lighter colors.
+     */
+    private double calculateShadeValue(Tri3D cameraRelativeTri3D){
+        //Compute the shade value given the camera-relative tri normal vector skew angles. This is a very rough way
+        //of computing shading, but doesn't look too bad.
+        Point3D normal = cameraRelativeTri3D.getPlaneNormalVector();
+        double xSkew = 1 - Math.abs(Math.atan(normal.getX()));
+        double ySkew = 1 - Math.abs(Math.atan(normal.getY()));
+        double shadeValue = (xSkew + ySkew) / 2;
+
+        //Caps the shade value between 0 and 1
+        shadeValue = Math.min(1, Math.max(0, shadeValue));
+
+        return shadeValue;
+    }
+
+    /**
+     * Returns the input world-space {@link Tri3D} relative to the camera.
+     *
+     * @param tri3D world-space {@link Tri3D}
+     * @return {@link Tri3D} relative to the camera.
+     */
+    public Tri3D getCameraRelativeTri3D(Tri3D tri3D){
+        return new Tri3D(
+                camera.calculateCameraRelativePoint(tri3D.getV0()),
+                camera.calculateCameraRelativePoint(tri3D.getV1()),
+                camera.calculateCameraRelativePoint(tri3D.getV2())
+        );
     }
 
     /**
