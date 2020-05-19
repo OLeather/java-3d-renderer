@@ -97,7 +97,7 @@ public class Main extends TimerTask implements KeyListener {
 
 
         //Add objects to the renderer
-        Renderer.getInstance().addObject(spaceshipObject);
+        Renderer.getInstance().addObject(dragonObject);
 
         //Initial object rendering
         Renderer.getInstance().renderObjects();
