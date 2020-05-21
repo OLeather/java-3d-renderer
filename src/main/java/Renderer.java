@@ -74,7 +74,11 @@ public class Renderer extends JFrame {
     }
 
     /**
-     * Calculates the zbuffer and renders the pixel colors given correct depth.
+     * Calculates the z-buffer and renders the pixel colors given correct depth.
+     *
+     * The z-buffer is a concept in computer graphics that deals with occluding objects. Although it is a widely
+     * documented concept, this is my individual solution to the problem and this specific algorithm code was developed
+     * individually by myself.
      *
      * @param tris      Array of {@link RenderTri}s to render onto the screen
      * @param triColors Array of colors for each tri
