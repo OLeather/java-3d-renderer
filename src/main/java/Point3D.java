@@ -17,6 +17,8 @@ public class Point3D {
 
     /**
      * Returns a {@link Point3D} from the input <code>point</code> multiplied by the input <code>matrix</code>.
+     * <p>
+     * SimpleMatrix class from EJML library: http://ejml.org/wiki/index.php?title=Main_Page
      *
      * @param point
      * @param matrix

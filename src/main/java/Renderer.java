@@ -76,9 +76,9 @@ public class Renderer extends JFrame {
     /**
      * Calculates the zbuffer and renders the pixel colors given correct depth.
      *
-     * @param tris
-     * @param triColors
-     * @return
+     * @param tris      Array of {@link RenderTri}s to render onto the screen
+     * @param triColors Array of colors for each tri
+     * @return 2d array of rendered pixel colors
      */
     public Color[][] calculateZBuffer(RenderTri[] tris, Color[] triColors) {
         //Initialize pixels array
@@ -141,14 +141,14 @@ public class Renderer extends JFrame {
 
     /**
      * Returns a black and white color shaded based on it's depth to the camera.
-     *
+     * <p>
      * Used to debug xbuffer calculations. The darker the color, the further from the camera.
      *
      * @param distance
      * @param debugMaxDistance
      * @return
      */
-    private Color getZBufferDebugColor(double distance, double debugMaxDistance){
+    private Color getZBufferDebugColor(double distance, double debugMaxDistance) {
         //Calculate value of color
         int v = (int) Math.min(Math.max(255 - (distance / debugMaxDistance * 255.0), 0), 255);
         return new Color(v, v, v);
@@ -160,7 +160,7 @@ public class Renderer extends JFrame {
      * @param cameraRelativeTri3D camera-relative {@link Tri3D}
      * @return shading value between 0 and 1. 0 means darker and 1 means lighter colors.
      */
-    private double calculateShadeValue(Tri3D cameraRelativeTri3D){
+    private double calculateShadeValue(Tri3D cameraRelativeTri3D) {
         //Compute the shade value given the camera-relative tri normal vector skew angles. This is a very rough way
         //of computing shading, but doesn't look too bad.
         Point3D normal = cameraRelativeTri3D.getPlaneNormalVector();
@@ -180,7 +180,7 @@ public class Renderer extends JFrame {
      * @param tri3D world-space {@link Tri3D}
      * @return {@link Tri3D} relative to the camera.
      */
-    public Tri3D getCameraRelativeTri3D(Tri3D tri3D){
+    public Tri3D getCameraRelativeTri3D(Tri3D tri3D) {
         return new Tri3D(
                 camera.calculateCameraRelativePoint(tri3D.getV0()),
                 camera.calculateCameraRelativePoint(tri3D.getV1()),
@@ -349,6 +349,7 @@ public class Renderer extends JFrame {
      * Applies a 3D rotation matrix to the input {@link Point3D}.
      * <p>
      * Rotation matrixes from https://en.wikipedia.org/wiki/Rotation_matrix
+     * SimpleMatrix class from EJML library: http://ejml.org/wiki/index.php?title=Main_Page
      *
      * @param point
      * @param rotation

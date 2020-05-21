@@ -45,6 +45,7 @@ public class Object3D {
             e.printStackTrace();
         }
 
+        int i = 0;
         //For each face (triangle), get the 3 vertices and add them to the triangle list
         for (OBJFace face : model.getObjects().get(0).getMeshes().get(0).getFaces()) {
             Point3D v0 = new Point3D(model.getVertex(face.getReferences().get(0)).x,
@@ -54,7 +55,10 @@ public class Object3D {
             Point3D v2 = new Point3D(model.getVertex(face.getReferences().get(2)).x,
                     model.getVertex(face.getReferences().get(2)).y, model.getVertex(face.getReferences().get(2)).z);
             tris.add(new Tri3D(v0, v1, v2));
+            i += 3;
         }
+
+        System.out.println(i);
 
         return new Object3D(tris.toArray(new Tri3D[]{}), name, color);
     }
