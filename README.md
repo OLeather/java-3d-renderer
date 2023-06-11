@@ -1,5 +1,5 @@
 # 3D Renderer
-![gif](https://github.com/OLeather/java-3d-renderer/blob/master/images/video.gif)
+![gif](https://github.com/OLeather/java-3d-renderer/blob/master/images/demo-gif.gif)
 Ever since I started to learn to code, I was always fascinated by the prospects of rendering 3D scenes on a computer. My ambitious goal was always to program a 3D game myself. After 11 years of learnng to code, I finally achieved that goal. This was my first (official) attempt at a 3D renderer I made in Java while in high school. 
 
 Nowadays, fast graphics libraries like OpenGL and Vulkan exist which achieve high performance 3D rendering and realistic shading. However, my goal was to learn the inner workings of those engines by researching what goes into a 3D renderer and coding one completely from scratch. The only library used in this project was Java Swing, wich I used simply to create a window and paint the scene pixel by pixel. Each pixel is generated using a series of algorithms, from triangle rendering to z-buffering to shading. The renderer also handles the proper coordinate transformations for a virtual scene camera, which can be controlled using the arrow and WASD keys to navigate the scene and rotate the virtual camera in real time.
