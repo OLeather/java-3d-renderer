@@ -16,8 +16,8 @@ public class Main extends TimerTask implements KeyListener {
     private boolean rightRotPressed = false;
     private boolean upRotPressed = false;
     private boolean downRotPressed = false;
-    private double camMoveSpeed = 0.5;
-    private double camRotateSpeed = 0.05;
+    private double camMoveSpeed = 0.1;
+    private double camRotateSpeed = 0.007;
 
     public Main() {
         init();
@@ -80,10 +80,10 @@ public class Main extends TimerTask implements KeyListener {
         triObj2.setPosition(new Point3D(0, 0, 6));
         triObj2.setRotationDegrees(new Point3D(-45, 0, 0));
 
-        cubeObject.setPosition(new Point3D(5, 0, 10));
+        cubeObject.setPosition(new Point3D(0, 0, 5));
         cubeObject.setScale(new Point3D(5, 5, 5));
 
-        sphereObject.setPosition(new Point3D(0, 0, 20));
+        sphereObject.setPosition(new Point3D(-2, 0, 15));
 
         monkeyObject.setPosition(new Point3D(0, 0, 20));
         monkeyObject.setRotationDegrees(new Point3D(180, 180, 0));
@@ -97,10 +97,11 @@ public class Main extends TimerTask implements KeyListener {
         carObject.setRotationDegrees(new Point3D(180, 180, 0));
 
         //Add objects to the renderer
-    //    Renderer.getInstance().addObject(triObj1);
-    //    Renderer.getInstance().addObject(triObj2);
+       Renderer.getInstance().addObject(triObj1);
+       Renderer.getInstance().addObject(triObj2);
 
-        Renderer.getInstance().addObject(carObject);
+        Renderer.getInstance().addObject(cubeObject);
+        // Renderer.getInstance().addObject(sphereObject);
 
         //Initial object rendering
         Renderer.getInstance().renderObjects();
