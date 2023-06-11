@@ -1,8 +1,8 @@
 # 3D Renderer
 
-Ever since I started to learn to code, I always had an ambitious dream to program a 3D game from scratch. After 11 years of learnng to code, I finally achieved that goal. This was my first attempt at a 3D renderer I made in java while in high school. 
+Ever since I started to learn to code, I always had an ambitious dream to program a 3D game from scratch. After 11 years of learnng to code, I finally achieved that goal. This was my first attempt at a 3D renderer I made in Java while in high school. 
 
-Why java? It was the language I was most comfortable with at the time. C++ would have been a better choice, and I may re-implement the renderer in C++ on a future date.
+Why Java? It was the language I was most comfortable with at the time. C++ would have been a better choice, and I may re-implement the renderer in C++ on a future date.
 # Features
 
 ## Z-buffer
