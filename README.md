@@ -118,6 +118,7 @@ private double calculateShadeValue(Tri3D cameraRelativeTri3D) {
 
 ## Model Rendering
 The basis of the renderer renders triangles. Since most 3D object file formats are represented in triangles, the renderer is able to render full complex 3D objects. Below are a few of the complex models (200,000+ tris) in the renderer.
+
 ![Dragon](https://github.com/OLeather/java-3d-renderer/blob/master/images/Screenshot%202023-06-11%20130850.png)
 ![Dragon1](https://github.com/OLeather/java-3d-renderer/blob/master/images/Screenshot%202023-06-11%20130904.png)
 ![Dragon2](https://github.com/OLeather/java-3d-renderer/blob/master/images/Screenshot%202023-06-11%20130915.png)
