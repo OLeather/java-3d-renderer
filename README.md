@@ -1,6 +1,6 @@
 # 3D Renderer
 
-Ever since I started to learn to code, I always had an ambitious dream to program a 3D game from scratch. After 11 years of coding, I finally achieved that goal. This was my first attempt at a 3D renderer I made in java while in high school. 
+Ever since I started to learn to code, I always had an ambitious dream to program a 3D game from scratch. After 11 years of learnng to code, I finally achieved that goal. This was my first attempt at a 3D renderer I made in java while in high school. 
 
 ## Z-buffer
 ![Z-buffer](https://github.com/OLeather/java-3d-renderer/blob/master/images/Screenshot%202023-06-11%20130716.png)
