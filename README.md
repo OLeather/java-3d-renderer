@@ -1,8 +1,11 @@
 # 3D Renderer
 
-Ever since I started to learn to code, I always had an ambitious dream to program a 3D game from scratch. After 11 years of learnng to code, I finally achieved that goal. This was my first attempt at a 3D renderer I made in Java while in high school. 
+Ever since I started to learn to code, I was always fascinated by the prospects of rendering 3D scenes on a computer. My ambitious goal was always to program a 3D game myself. After 11 years of learnng to code, I finally achieved that goal. This was my first (official) attempt at a 3D renderer I made in Java while in high school. 
+
+Nowadays, fast graphics libraries like OpenGL and Vulkan exist which achieve high performance 3D rendering and realistic shading. However my goal was to learn the inner workings of those engines by coding one completely from scratch. The only library used in this project was Java Swing, in which I paint each scene pixel by pixel. Each pixel is generated using a series of algorithms, from triangle rendering to z-buffering to shading. The renderer also handles the proper coordinate transformations for a virtual scene camera, which can be controlled using the arrow and WASD keys to navigate the scene and rotate the virtual camera in real time.
 
 Why Java? It was the language I was most comfortable with at the time. C++ would have been a better choice, and I may re-implement the renderer in C++ on a future date.
+
 # Features
 
 ## Z-buffer
