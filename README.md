@@ -1,5 +1,5 @@
 # 3D Renderer
-![video](https://github.com/OLeather/java-3d-renderer/assets/43189206/f9cfe4b6-2e13-40f9-8a71-46cb9dc72a48)
+![Untitled video - Made with Clipchamp (2)](https://github.com/OLeather/java-3d-renderer/assets/43189206/4c73c3d0-a280-4c9a-a741-fddadbcd3229)
 
 Ever since I started to learn to code, I was always fascinated by the prospects of rendering 3D scenes on a computer. My ambitious goal was always to program a 3D game myself. After 11 years of learnng to code, I finally achieved that goal. This was my first (official) attempt at a 3D renderer I made in Java while in high school. 
 
