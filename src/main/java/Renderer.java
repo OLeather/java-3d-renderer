@@ -559,7 +559,7 @@ public class Renderer extends JFrame {
                     } else {
                         g.setColor(pixels[r][c]);
                     }
-                    g.drawLine(r, c, r, c);
+                    g.fillRect(r, c, 1, 1);
                 }
             }
         }

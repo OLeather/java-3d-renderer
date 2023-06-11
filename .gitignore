@@ -3,6 +3,7 @@
 # Build
 build
 out
+bin
 
 # Gradle
 .gradle

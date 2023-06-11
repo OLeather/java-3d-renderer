@@ -71,7 +71,7 @@ public class Main extends TimerTask implements KeyListener {
         Object3D sphereObject = Object3D.fromOBJFile(sphereFile, "sphere", Color.BLUE);
         Object3D monkeyObject = Object3D.fromOBJFile(monkeyFile, "monkey", Color.RED);
         Object3D dragonObject = Object3D.fromOBJFile(dragonFile, "dragon", Color.RED);
-        Object3D carObject = Object3D.fromOBJFile(carFile, "car", Color.RED);
+        Object3D carObject = Object3D.fromOBJFile(carFile, "car", Color.BLUE);
 
         //Adjust positions and rotations of test objects
         triObj1.setPosition(new Point3D(0, 0, 10));
@@ -97,10 +97,10 @@ public class Main extends TimerTask implements KeyListener {
         carObject.setRotationDegrees(new Point3D(180, 180, 0));
 
         //Add objects to the renderer
-//        Renderer.getInstance().addObject(triObj1);
-//        Renderer.getInstance().addObject(triObj2);
+    //    Renderer.getInstance().addObject(triObj1);
+    //    Renderer.getInstance().addObject(triObj2);
 
-        Renderer.getInstance().addObject(dragonObject);
+        Renderer.getInstance().addObject(carObject);
 
         //Initial object rendering
         Renderer.getInstance().renderObjects();
